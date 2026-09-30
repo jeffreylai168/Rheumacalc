@@ -1,26 +1,15 @@
 <!DOCTYPE html>
-<!--
-  RheumCalc — App 介面版
-  修訂紀錄
-  2026/09/28  原始版（Kaku, NTUH）：計算器內容與計分邏輯
-  2026/09/30  App 介面版：依疾病分組首頁、底部分頁（首頁/搜尋/收藏/最近）、歷史紀錄式返回、
-              浮動結果列、加入主畫面設定；導覽文字繁中化。計算器內容、公式、cut-off 均未更動。
-              新增程式碼集中於 "APP SHELL" CSS 區塊與檔尾獨立 <script>。
-  2026/09/30  部署版：manifest.json、圖示檔、sw.js（離線），供 GitHub Pages 等 https 網址部署。
--->
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#155ec7">
-<meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RheumCalc">
-<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <title>RheumCalc — Rheumatology Clinical Calculators</title>
 <style>
   :root{
@@ -475,168 +464,134 @@
 
   /* =========================================================
      APP SHELL (2026/09/30) — navigation & layout only.
-     No calculator markup, scoring code or wording is changed here.
+     Two ways to browse (依類型 = criteria / activity, 依疾病 = by disease)
+     plus 收藏 favourites. Top tabs inside the header on desktop, a bottom
+     tab bar on phones. Calculator markup and scoring are untouched.
   ========================================================= */
   :root{
-    --app-bar-h:56px; --tab-h:58px;
-    --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+    --tab-h:60px; --sab:env(safe-area-inset-bottom,0px); --sat:env(safe-area-inset-top,0px);
     --c-sle:#7a3fb0; --c-sjd:#0f7a6b; --c-ssc:#7a5c2e; --c-iim:#b45f06;
-    --c-ra:#155ec7; --c-spa:#1a8f4c; --c-vas:#c22b2b; --c-oth:#5b6675;
+    --c-art:#155ec7; --c-vas:#c22b2b; --c-oth:#5b6675;
   }
-  html{background:var(--bg); scroll-padding-top:calc(var(--app-bar-h) + var(--sat) + 10px);}
-  body.app{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang TC","Noto Sans TC","Microsoft JhengHei",Helvetica,Arial,sans-serif;
-    background:var(--bg);
-    padding-top:calc(var(--app-bar-h) + var(--sat));
-    padding-bottom:calc(var(--tab-h) + var(--sab) + 12px);
-    -webkit-text-size-adjust:100%;
-  }
-  body.app[data-view=calc]{padding-bottom:calc(112px + var(--sab));}
-  body.app > header{display:none !important;}
-  body.app #home{display:none !important;}
-  body.app:not([data-view=calc]) #panels{display:none !important;}
-  body.app .calc-actions > .toggle-btn{display:none;}
-  body.app aside{top:calc(var(--app-bar-h) + var(--sat)); max-height:calc(100vh - var(--app-bar-h) - var(--sat));}
-  body.app main{padding-bottom:24px;}
-  .app-bar button, .tab-bar button, .row, .home-search, .res-bar, .app-link{-webkit-tap-highlight-color:transparent;}
+  header{padding-top:calc(18px + var(--sat));}
+  .menu-btn, aside, .nav-overlay{display:none !important;}
+  .layout{max-width:1180px;}
+  main{padding-bottom:40px;}
+  .calc-header > .calc-actions > .toggle-btn{white-space:nowrap;}
+  button, .row-open{-webkit-tap-highlight-color:transparent;}
+  #home.hide{display:none;}
 
-  /* ---------- Views ---------- */
-  .view{display:none;}
-  body[data-view=home] #v-home, body[data-view=search] #v-search,
-  body[data-view=fav] #v-fav, body[data-view=recent] #v-recent{display:block;}
+  /* ---------- Desktop: tabs in the header ---------- */
+  .top-tabs{display:flex; gap:4px; margin-left:auto; flex:none;}
+  .top-tabs + .credit{margin-left:18px;}
+  .top-tabs button{
+    display:flex; align-items:center; gap:7px; border:0; background:transparent; color:#fff;
+    font:inherit; font-size:13px; font-weight:600; padding:8px 13px; border-radius:9px; cursor:pointer;
+  }
+  .top-tabs svg{width:17px; height:17px;}
+  .top-tabs button[aria-current=page]{background:rgba(255,255,255,.22);}
+  .top-tabs button:focus-visible{outline:2px solid #fff; outline-offset:-2px;}
+  @media (hover:hover){ .top-tabs button:hover{background:rgba(255,255,255,.14);} }
 
-  /* ---------- Top app bar ---------- */
-  .app-bar{
-    position:fixed; top:0; left:0; right:0; z-index:50; padding-top:var(--sat);
-    background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%); color:#fff;
-    box-shadow:0 1px 6px rgba(9,30,66,.22);
-  }
-  .ab-in{height:var(--app-bar-h); max-width:1280px; margin:0 auto; display:flex; align-items:center; gap:8px; padding:0 8px 0 10px;}
-  .ab-btn{
-    width:42px; height:42px; flex:none; border:0; border-radius:10px; background:transparent; color:#fff;
-    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; font:inherit;
-  }
-  .ab-btn:active{background:rgba(255,255,255,.2);}
-  @media (hover:hover){ .ab-btn:hover{background:rgba(255,255,255,.14);} }
-  .ab-btn:focus-visible, .ab-nav button:focus-visible{outline:2px solid #fff; outline-offset:-2px;}
-  .ab-logo{
-    width:34px; height:34px; flex:none; border-radius:9px; background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:15px; margin:0 4px 0 2px;
-  }
-  .ab-title{flex:1; min-width:0; line-height:1.2;}
-  .ab-t1{font-size:16.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .ab-t2{font-size:12px; color:#dce8fb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;}
-  .ab-back, .ab-star{display:none;}
-  body[data-view=calc] .ab-back, body[data-view=calc] .ab-star{display:flex;}
-  body[data-view=calc] .ab-logo{display:none;}
-  .ab-star svg{width:24px; height:24px;}
-  .ab-star[aria-pressed=true] svg{fill:#ffd54a; stroke:#ffd54a;}
-  .ab-nav{display:flex; gap:2px; margin-left:8px;}
-  .ab-nav button{
-    border:0; background:transparent; color:#fff; font:inherit; font-size:14px; font-weight:600;
-    padding:8px 13px; border-radius:8px; cursor:pointer;
-  }
-  .ab-nav button[aria-current=page]{background:rgba(255,255,255,.22);}
-  @media (hover:hover){ .ab-nav button:hover{background:rgba(255,255,255,.14);} }
-
-  /* ---------- Bottom tab bar (phones & tablets) ---------- */
+  /* ---------- Phone / tablet: bottom tab bar ---------- */
   .tab-bar{
-    position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
-    background:rgba(255,255,255,.97); border-top:1px solid var(--line);
-    padding-bottom:var(--sab);
+    position:fixed; left:0; right:0; bottom:0; z-index:50; display:none;
+    background:rgba(255,255,255,.97); border-top:1px solid var(--line); padding-bottom:var(--sab);
   }
-  @supports (backdrop-filter:blur(8px)){ .tab-bar{background:rgba(255,255,255,.88); backdrop-filter:blur(12px) saturate(1.4);} }
+  @supports (backdrop-filter:blur(8px)){ .tab-bar{background:rgba(255,255,255,.88); backdrop-filter:blur(12px) saturate(1.4); -webkit-backdrop-filter:blur(12px) saturate(1.4);} }
   .tab-bar button{
     flex:1; height:var(--tab-h); border:0; background:none; cursor:pointer; padding:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    font:inherit; font-size:11.5px; font-weight:600; color:#7a8595;
+    font:inherit; font-size:10.5px; font-weight:600; color:#7a8595;
   }
   .tab-bar svg{width:24px; height:24px;}
   .tab-bar button[aria-current=page]{color:var(--blue);}
-  .tab-bar button[aria-current=page] svg{stroke-width:2.3;}
-  .tab-bar button:focus-visible{outline:2px solid var(--blue); outline-offset:-4px; border-radius:10px;}
-  body[data-view=calc] .tab-bar{display:none;}
-
-  @media (max-width:1023px){
-    .ab-nav{display:none;}
-    body.app aside, body.app .nav-overlay, body.app .menu-btn{display:none !important;}
-    body.app main{padding:12px 12px 16px;}
+  .tab-bar button[aria-current=page] svg{stroke-width:2.4;}
+  .tab-bar button[data-go=fav][aria-current=page] svg{fill:currentColor;}
+  .tab-bar button:focus-visible{outline:2px solid var(--blue); outline-offset:-5px; border-radius:12px;}
+  @media (max-width:900px){
+    .top-tabs{display:none;}
+    .top-tabs + .credit{margin-left:auto;}
+    .tab-bar{display:flex;}
+    body{padding-bottom:calc(var(--tab-h) + var(--sab) + 8px);}
+    body[data-view=calc]{padding-bottom:calc(var(--tab-h) + var(--sab) + 84px);}
+    header{padding:calc(12px + var(--sat)) 16px 12px;}
+    main{padding:14px 12px 24px;}
   }
-  @media (min-width:1024px){
-    .tab-bar{display:none;}
-    body.app{padding-bottom:24px;}
-    body.app[data-view=calc]{padding-bottom:124px;}
-  }
+  @media (min-width:901px){ body[data-view=calc]{padding-bottom:96px;} }
   @media (max-width:600px){
-    body.app .card{padding:16px 14px; border-radius:12px;}
-    body.app .calc-header h2{font-size:18px;}
+    .card{padding:16px 14px; border-radius:12px;} .calc-header h2{font-size:18px;}
+    .calc-header > .calc-actions{flex:1 1 100%;}
+    .calc-actions > *{flex:1 1 auto; justify-content:center; text-align:center;}
   }
 
-  /* ---------- Home / list rows ---------- */
+  /* ---------- List views ---------- */
+  .view-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:2px 4px 12px;}
+  .view-head h2{margin:0; font-size:17.5px; font-weight:800;}
+  .view-head .en{font-size:12.5px; font-weight:600; color:var(--ink-soft);}
   .home-search{
-    display:flex; align-items:center; gap:10px; width:100%; height:48px; padding:0 14px; margin:2px 0 20px;
-    border:1px solid var(--line); border-radius:12px; background:#fff; color:#7a8595;
-    font:inherit; font-size:14.5px; text-align:left; cursor:text;
+    display:flex; align-items:center; gap:10px; height:48px; padding:0 14px; margin:0 0 18px;
+    background:#fff; border:1.5px solid var(--line); border-radius:12px; cursor:text;
   }
-  .home-search svg{flex:none; width:18px; height:18px;}
-  .home-search:focus-visible{outline:2px solid var(--blue); outline-offset:1px;}
+  .home-search:focus-within{border-color:var(--blue); box-shadow:0 0 0 3px rgba(21,94,199,.12);}
+  .home-search svg{flex:none; width:18px; height:18px; color:var(--ink-soft);}
+  .home-search input{flex:1; min-width:0; border:0; outline:none; background:transparent; font:inherit; font-size:16px; color:var(--ink);}   /* 16px keeps iOS from zooming on focus */
+  .home-search input::placeholder{font-size:14px;}
+  body[data-view=fav] .home-search{display:none;}
+  body[data-view=type] .row-tag{display:none;}   /* the section heading already says criteria / activity */
   .app-sec{margin:0 0 22px;}
-  .app-sec-h{display:flex; align-items:center; gap:10px; margin:0 4px 8px; font-size:15.5px; font-weight:700; color:var(--ink);}
-  .app-sec-h .en{font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+  .app-sec-h{display:flex; align-items:center; gap:10px; margin:0 4px 8px; font-size:14px; font-weight:700;}
   .app-sec-h .n{margin-left:auto; font-size:12px; font-weight:600; color:var(--ink-soft);}
   .grp-chip{
-    flex:none; min-width:46px; height:24px; padding:0 7px; border-radius:6px; color:#fff;
-    font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center;
+    flex:none; min-width:46px; height:24px; padding:0 8px; border-radius:6px; color:#fff;
+    font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
   }
   .rows{background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden;}
-  .row{
-    display:flex; align-items:center; gap:12px; width:100%; min-height:58px; padding:11px 12px 11px 14px;
-    border:0; border-top:1px solid var(--line); background:#fff; font:inherit; text-align:left;
-    color:var(--ink); cursor:pointer;
-  }
+  .row{display:flex; align-items:stretch; border-top:1px solid var(--line);}
   .row:first-child{border-top:0;}
-  .row:active{background:var(--blue-pale);}
-  @media (hover:hover){ .row:hover{background:#f6f9fd;} }
-  .row:focus-visible{outline:2px solid var(--blue); outline-offset:-2px;}
+  .row-open{
+    flex:1; min-width:0; display:flex; align-items:center; gap:10px; min-height:60px; padding:11px 6px 11px 14px;
+    border:0; background:#fff; font:inherit; text-align:left; color:var(--ink); cursor:pointer;
+  }
+  .row-open:active{background:var(--blue-pale);}
+  @media (hover:hover){ .row-open:hover, .row-open:hover + .row-fav{background:#f6f9fd;} }
+  .row-open:focus-visible, .row-fav:focus-visible{outline:2px solid var(--blue); outline-offset:-2px;}
   .row-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;}
   .row-nm{font-size:14.5px; font-weight:700; line-height:1.3;}
-  .row-star{color:#c99a06; margin-left:6px; font-size:13px;}
-  .row-ds{
-    font-size:12px; color:var(--ink-soft); line-height:1.4;
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-  }
-  .row-tag{flex:none; align-self:flex-start; margin-top:1px; font-size:11px; font-weight:700; padding:3px 7px; border-radius:6px; white-space:nowrap;}
+  .row-grp{font-size:10.5px; font-weight:700;}
+  .row-ds{font-size:12px; color:var(--ink-soft); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .row-tag{flex:none; align-self:flex-start; margin-top:1px; font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; white-space:nowrap;}
   .row-tag.criteria{background:var(--teal-pale); color:var(--teal);}
   .row-tag.activity{background:var(--blue-pale); color:var(--blue-dark);}
-  .row-grp{font-size:11px; font-weight:700;}
-  .row-chev{flex:none; width:16px; height:16px; color:#b3bcc9;}
+  .row-fav{
+    flex:none; width:48px; border:0; background:#fff; color:#b3bcc9; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .row-fav svg{width:21px; height:21px;}
+  .row-fav[aria-pressed=true]{color:#d9a400;}
+  .row-fav[aria-pressed=true] svg{fill:#ffcf3f;}
   @media (min-width:1024px){ .grp-wrap{display:grid; grid-template-columns:1fr 1fr; gap:0 20px; align-items:start;} }
-
-  /* ---------- Search / empty states ---------- */
-  .search-wrap{position:sticky; top:calc(var(--app-bar-h) + var(--sat)); z-index:5; background:var(--bg); padding:2px 0 12px;}
-  .search-field{display:flex; align-items:center; gap:10px; height:50px; padding:0 14px; background:#fff; border:1.5px solid var(--blue); border-radius:12px;}
-  .search-field svg{flex:none; width:18px; height:18px; color:var(--ink-soft);}
-  .search-field input{flex:1; min-width:0; border:0; outline:none; background:transparent; font:inherit; font-size:16px; color:var(--ink);}
-  .search-field input::-webkit-search-cancel-button{cursor:pointer;}
-  .empty{padding:40px 22px; text-align:center; color:var(--ink-soft); font-size:14px; line-height:1.7;}
+  .empty{padding:40px 22px; text-align:center; color:var(--ink-soft); font-size:13px; line-height:1.7;}
   .empty b{color:var(--ink);}
-  .list-actions{display:flex; justify-content:flex-end; margin:14px 2px 0;}
-  .app-link{border:0; background:none; font:inherit; font-size:13px; font-weight:600; color:var(--red); cursor:pointer; padding:8px 6px;}
-  .view-h{font-size:19px; font-weight:800; margin:4px 4px 14px;}
 
-  /* ---------- About ---------- */
-  .about{margin:26px 4px 6px; font-size:12px; color:var(--ink-soft); line-height:1.6;}
-  .about .credit-line b{color:var(--ink);}
-  .about details{margin-top:8px;}
-  .about summary{cursor:pointer; font-weight:600; color:var(--ink); padding:4px 0;}
-  .about table{border-collapse:collapse; width:100%; margin-top:8px; background:#fff; font-size:12px;}
-  .about th, .about td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top;}
-  .about th{background:#f1f4f8; color:var(--ink);}
+  /* ---------- Favourite star inside each calculator ---------- */
+  .star-pull{
+    margin-top:10px; font:inherit; font-size:12.5px; font-weight:600; color:var(--blue); background:var(--blue-pale);
+    border:1px solid #c6dcf7; border-radius:7px; padding:6px 10px; cursor:pointer; text-align:left;
+  }
+  .star-pull:hover{border-color:var(--blue);}
+  .calc-fav{
+    display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13px; font-weight:700;
+    padding:8px 12px; border-radius:7px; cursor:pointer; white-space:nowrap;
+    border:1.5px solid #e6cf7d; background:#fffbea; color:#8a6a00;
+  }
+  .calc-fav svg{width:17px; height:17px;}
+  .calc-fav[aria-pressed=true]{background:#fff3c4; border-color:#d9a400;}
+  .calc-fav[aria-pressed=true] svg{fill:#ffcf3f; stroke:#b58900;}
 
-  /* ---------- Floating result bar ---------- */
+  /* ---------- Floating result bar (calculator view) ---------- */
   .res-bar{
-    position:fixed; left:50%; bottom:calc(10px + var(--sab)); z-index:45;
+    position:fixed; left:50%; bottom:calc(12px + var(--sab)); z-index:45;
     transform:translateX(-50%); width:min(720px, calc(100% - 20px));
     display:flex; align-items:center; gap:14px; padding:10px 12px 10px 14px;
     background:#fff; border:1px solid var(--line); border-left:6px solid var(--rb,#aab3c0); border-radius:14px;
@@ -644,24 +599,22 @@
     font:inherit; text-align:left; color:var(--ink); cursor:pointer;
     transition:opacity .16s ease-out, transform .16s ease-out;
   }
+  @media (max-width:900px){ .res-bar{bottom:calc(var(--tab-h) + var(--sab) + 8px);} }
   .res-bar[hidden]{display:none;}
   .res-bar.off{opacity:0; pointer-events:none; transform:translate(-50%,14px);}
   .res-bar:focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
   .rb-scores{display:flex; gap:16px; flex:none;}
   .rb-s{display:flex; flex-direction:column; line-height:1;}
-  .rb-num{font-size:25px; font-weight:800; color:var(--blue-dark); font-variant-numeric:tabular-nums;}
+  .rb-num{font-size:24px; font-weight:800; color:var(--blue-dark); font-variant-numeric:tabular-nums;}
   .rb-lab{font-size:10.5px; font-weight:600; color:var(--ink-soft); margin-top:4px; max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .rb-pill{
-    flex:1; min-width:0; font-size:13px; font-weight:700; line-height:1.35; color:var(--rbt,var(--ink-soft));
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-  }
+  .rb-pill{flex:1; min-width:0; font-size:13px; font-weight:700; line-height:1.35; color:var(--rbt,var(--ink-soft)); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
   .rb-go{flex:none; display:flex; flex-direction:column; align-items:center; gap:1px; font-size:10.5px; font-weight:600; color:var(--ink-soft);}
   .rb-go svg{width:18px; height:18px;}
-  .res-bar.green {--rb:var(--green);  --rbt:var(--green);}
-  .res-bar.yellow{--rb:#d8a60f;       --rbt:var(--yellow);}
-  .res-bar.orange{--rb:#e07b12;       --rbt:var(--orange);}
-  .res-bar.red   {--rb:var(--red);    --rbt:var(--red);}
-  @media (max-width:380px){ .rb-num{font-size:22px;} .rb-go span{display:none;} }
+  .res-bar.green {--rb:var(--green); --rbt:var(--green);}
+  .res-bar.yellow{--rb:#d8a60f;      --rbt:var(--yellow);}
+  .res-bar.orange{--rb:#e07b12;      --rbt:var(--orange);}
+  .res-bar.red   {--rb:var(--red);   --rbt:var(--red);}
+  @media (max-width:380px){ .rb-num{font-size:21px;} .rb-go span{display:none;} }
   @media (prefers-reduced-motion:reduce){ .res-bar{transition:none;} }
 </style>
 </head>
@@ -676,7 +629,8 @@
     <h1>RheumCalc</h1>
     <p>Clinical calculators for Rheumatology — disease activity scores &amp; classification criteria</p>
   </div>
-  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/09/28 version</div>
+  <nav class="top-tabs" id="topTabs" aria-label="主要導覽"></nav>
+  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/09/30 version</div>
 </header>
 
 <div class="layout">
@@ -686,20 +640,18 @@
       <span>Calculators</span>
       <button onclick="toggleNav(false)" aria-label="Close">✕</button>
     </div>
-    <div class="search-box">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="searchInput" type="text" placeholder="搜尋計算器…">
-    </div>
     <div id="navList"></div>
   </aside>
 
   <main>
     <div id="home">
-      <div class="card">
-        <h2 style="margin-top:0;">All calculators</h2>
-        <p class="sub" style="color:var(--ink-soft);">Select a calculator from the list on the left, or click a tile below. Enter values and results update live.</p>
-        <div class="home-grid" id="homeGrid"></div>
-      </div>
+      <div class="view-head" id="viewHead"></div>
+      <label class="home-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input id="searchInput" type="search" placeholder="搜尋名稱、縮寫或疾病，如 DAS28、狼瘡" autocomplete="off" enterkeyhint="search" aria-label="搜尋計算器">
+      </label>
+      <div id="homeList"></div>
+      <div class="home-grid" id="homeGrid" hidden></div>
     </div>
     <div id="panels"></div>
   </main>
@@ -720,9 +672,10 @@ const CALCS = [
   /* --- Sjögren --- */
   {id:'sjogren2016', name:'Sjögren criteria', cat:'criteria', short:"Classification criteria for primary Sjögren's disease"},
   {id:'sjogren2002', name:'Sjögren criteria', cat:'criteria', short:"Revised American-European Consensus Group criteria for Sjögren's syndrome"},
-  {id:'essdai', name:'ESSDAI', cat:'activity', short:"EULAR Sjögren's Syndrome Disease Activity Index (systemic, clinician-scored)"},
+  {id:'essdai', name:'ESSDAI / ClinESSDAI', cat:'activity', short:"EULAR Sjögren's Syndrome Disease Activity Index (systemic, clinician-scored) — includes a ClinESSDAI sub-tab"},
   {id:'esspri', name:'ESSPRI', cat:'activity', short:"EULAR Sjögren's Syndrome Patient Reported Index"},
-  {id:'cress', name:'CRESS', cat:'activity', short:"Composite of Relevant Endpoints for Sjögren's Syndrome (treatment-response index)"},
+  {id:'cress', name:'CRESS / STAR', cat:'activity', short:"Composite of Relevant Endpoints for Sjögren's Syndrome (treatment-response index)"},
+  {id:'star', name:'CRESS / STAR', cat:'activity', short:"Sjögren's Tool for Assessing Response (treatment-response composite)"},
   /* --- Systemic sclerosis --- */
   {id:'ssc2013', name:'SSc criteria', cat:'criteria', short:'Classification criteria for systemic sclerosis'},
   {id:'mrss', name:'mRSS', cat:'activity', short:'Modified Rodnan Skin Score, for systemic sclerosis'},
@@ -761,6 +714,7 @@ const CALCS = [
   {id:'bvas', name:'BVAS v.3', cat:'activity', short:'Birmingham Vasculitis Activity Score (simplified, domain-level)'},
   /* --- Others --- */
   {id:'aps2023', name:'APS criteria', cat:'criteria', short:'Classification criteria for antiphospholipid syndrome'},
+  {id:'aps2006', name:'APS criteria', cat:'criteria', short:'Revised Sapporo (Sydney) classification criteria for antiphospholipid syndrome'},
   {id:'igg4rd2019', name:'IgG4-RD criteria', cat:'criteria', short:'Classification criteria for IgG4-related disease'},
   {id:'igg4rd2020', name:'IgG4-RD criteria', cat:'criteria', short:'Comprehensive diagnostic (RCD) criteria for IgG4-related disease'},
   {id:'ipaf', name:'IPAF criteria', cat:'criteria', short:'Interstitial pneumonia with autoimmune features'},
@@ -783,6 +737,10 @@ const CALC_GROUPS = [
    members:[['iga2010','2010 EULAR/PRINTO/PRES'],['hsp1990','1990 ACR (legacy HSP)']]},
   {id:'g-igg4', name:'IgG4-RD criteria', cat:'criteria', short:'IgG4-related disease — classification & diagnostic criteria (tabs)',
    members:[['igg4rd2019','2019 ACR/EULAR classification'],['igg4rd2020','2020 revised comprehensive diagnostic (RCD)']]},
+  {id:'g-cress', name:'CRESS / STAR', cat:'activity', short:"Sjögren's treatment-response composites — CRESS & STAR (tabs)",
+   members:[['cress','CRESS'],['star','STAR (Sjögren’s Tool for Assessing Response)']]},
+  {id:'g-aps', name:'APS criteria', cat:'criteria', short:'Antiphospholipid syndrome — 2023 ACR/EULAR & 2006 revised Sapporo (tabs)',
+   members:[['aps2023','2023 ACR/EULAR'],['aps2006','2006 revised Sapporo (Sydney)']]},
 ];
 const GROUP_OF = {};
 CALC_GROUPS.forEach(g=>{ g.last = g.members[0][0]; g.members.forEach(([mid])=>GROUP_OF[mid]=g); });
@@ -813,7 +771,7 @@ const homeGrid = document.getElementById('homeGrid');
 
 function buildNav(filter){
   const f = (filter||'').trim().toLowerCase();
-  const groups = [['criteria','分類／診斷標準'],['activity','疾病活動度']];
+  const groups = [['criteria','Classification criteria'],['activity','Disease activity scores']];
   navList.innerHTML = '';
   groups.forEach(([cat,label])=>{
     const items = navEntries().filter(c=>c.cat===cat && c.search.toLowerCase().includes(f));
@@ -1877,6 +1835,59 @@ function apsCalc(){
 apsCalc();
 
 /* =========================================================
+   18b. 2006 revised Sapporo (Sydney) APS classification criteria
+   (Miyakis S, et al. J Thromb Haemost 2006;4(2):295–306)
+========================================================= */
+const APS06_LAB = [
+  ['aps06-la','Lupus anticoagulant (LA) present in plasma, detected per ISTH guidelines'],
+  ['aps06-acl','Anticardiolipin (aCL) IgG and/or IgM, medium or high titre (&gt;40 GPL/MPL, or &gt;99th percentile), by standardized ELISA'],
+  ['aps06-b2','Anti-β2-glycoprotein I IgG and/or IgM, titre &gt;99th percentile, by standardized ELISA'],
+];
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('aps2006','APS criteria',
+  'Revised Sapporo (Sydney) classification criteria — APS is present if ≥1 clinical criterion AND ≥1 laboratory criterion are met.','criteria',
+  `<div class="field full" style="margin-bottom:10px;">
+     <div class="check-item" style="background:var(--yellow-bg); border-radius:7px; padding:8px 10px;">
+       <input type="checkbox" id="aps06-timing" onchange="aps06Calc()"><label for="aps06-timing"><b>Required to apply:</b> the positive aPL test and the clinical manifestation are separated by ≥12 weeks and ≤5 years (classification is not made if they are &lt;12 weeks or &gt;5 years apart)</label>
+     </div></div>
+   <fieldset><legend>Clinical criteria (≥1 required)</legend>
+     <div class="check-item"><input type="checkbox" id="aps06-thromb" onchange="aps06Calc()"><label for="aps06-thromb"><b>Vascular thrombosis:</b> ≥1 clinical episode of arterial, venous, or small-vessel thrombosis in any tissue or organ, confirmed by objective validated criteria (imaging or histopathology; on histopathology, thrombosis without significant evidence of vessel-wall inflammation)</label></div>
+     <div class="hint" style="margin:8px 0 4px;"><b>Pregnancy morbidity</b> (any one)</div>
+     <div class="check-item"><input type="checkbox" id="aps06-preg1" onchange="aps06Calc()"><label for="aps06-preg1">≥1 unexplained death of a morphologically normal fetus at or beyond the 10th week of gestation</label></div>
+     <div class="check-item"><input type="checkbox" id="aps06-preg2" onchange="aps06Calc()"><label for="aps06-preg2">≥1 premature birth of a morphologically normal neonate before the 34th week of gestation, because of eclampsia or severe pre-eclampsia, or recognized features of placental insufficiency</label></div>
+     <div class="check-item"><input type="checkbox" id="aps06-preg3" onchange="aps06Calc()"><label for="aps06-preg3">≥3 unexplained consecutive spontaneous abortions before the 10th week of gestation, with maternal anatomic/hormonal abnormalities and paternal/maternal chromosomal causes excluded</label></div>
+   </fieldset>
+   <fieldset style="margin-top:10px;"><legend>Laboratory criteria (≥1 required) — present on ≥2 occasions ≥12 weeks apart</legend>
+     ${APS06_LAB.map(([id,l])=>`<div class="check-item"><input type="checkbox" id="${id}" onchange="aps06Calc()"><label for="${id}">${l}</label></div>`).join('')}
+   </fieldset>`,
+  `<div style="display:flex; gap:24px; flex-wrap:wrap;">
+     <div><div class="score" id="aps06-cscore">0<small>Clinical criteria met</small></div></div>
+     <div><div class="score" id="aps06-lscore">0<small>Laboratory criteria met</small></div></div>
+   </div><span class="pill neutral" id="aps06-pill">Enter values</span>`,
+  'Definite APS = ≥1 clinical + ≥1 laboratory criterion, with the aPL test and clinical event ≥12 weeks and ≤5 years apart. Recommended laboratory sub-classification: category I = more than one laboratory criterion present (any combination); IIa = LA alone; IIb = aCL alone; IIc = anti-β2GPI alone. Coexisting inherited or acquired risk factors for thrombosis do not exclude APS but should be recorded (stratify patients with vs. without them).',
+  'Miyakis S, Lockshin MD, Atsumi T, et al. International consensus statement on an update of the classification criteria for definite antiphospholipid syndrome (APS). <i>J Thromb Haemost.</i> 2006;4(2):295–306.'
+));
+function aps06Calc(){
+  const on = id=>document.getElementById(id).checked;
+  const clinIds = ['aps06-thromb','aps06-preg1','aps06-preg2','aps06-preg3'];
+  const c = clinIds.filter(on).length;
+  const labOn = APS06_LAB.map(([id])=>on(id));
+  const l = labOn.filter(Boolean).length;
+  const timing = on('aps06-timing');
+  document.getElementById('aps06-cscore').innerHTML = c+'<small>Clinical criteria met (need ≥1)</small>';
+  let cat = '';
+  if(l>1) cat = 'category I';
+  else if(labOn[0]) cat = 'category IIa (LA alone)';
+  else if(labOn[1]) cat = 'category IIb (aCL alone)';
+  else if(labOn[2]) cat = 'category IIc (anti-β2GPI alone)';
+  document.getElementById('aps06-lscore').innerHTML = l+'<small>Laboratory criteria met (need ≥1)'+(cat?' — '+cat:'')+'</small>';
+  const pill = document.getElementById('aps06-pill');
+  if(!timing){ pill.className='pill neutral'; pill.textContent='Timing requirement not met (aPL and clinical event must be ≥12 weeks and ≤5 years apart)'; }
+  else if(c>=1 && l>=1){ pill.className='pill red'; pill.textContent='Meets revised Sapporo criteria for definite APS — laboratory '+cat; }
+  else { pill.className='pill neutral'; pill.textContent='Does not meet criteria (clinical '+c+'/1, laboratory '+l+'/1)'; }
+}
+aps06Calc();
+
+/* =========================================================
    19. ASAS axSpA / Peripheral SpA classification criteria
 ========================================================= */
 panelsRoot.insertAdjacentHTML('beforeend', panelShell('axspa','SpA criteria',
@@ -2921,27 +2932,52 @@ const ESSDAI_DOMAINS = [
     [2,'Moderate — cryoglobulinemia, and/or hypergammaglobulinemia or IgG >20g/L, and/or new/recent hypogammaglobulinemia or IgG <5g/L'],
   ]},
 ];
-panelsRoot.insertAdjacentHTML('beforeend', panelShell('essdai','ESSDAI',
-  "The clinician-scored systemic disease activity index for primary Sjögren's disease. Domain levels below are transcribed from the ESSDAI user guide (Seror et al. 2015) with numeric thresholds preserved where the source specifies them; some long explanatory/exclusion clauses are condensed — for full nuance and edge cases, consult the official user guide.",'activity',
-  `<div class="grid single">
-   ${ESSDAI_DOMAINS.map(d=>`<div class="field full"><label>${d.name} <span class="hint">(weight ×${d.weight})</span></label>
+/* ClinESSDAI (Seror R, et al. Ann Rheum Dis 2016) — same domains and activity levels as ESSDAI,
+   biological domain removed and the remaining domains re-weighted */
+const CLINESSDAI_W = {const:4, lymph:4, gland:2, artic:3, cutan:3, pulm:6, renal:6, musc:7, pns:5, cns:5, hema:2};
+ESSDAI_DOMAINS.forEach(d=>{ d.clinW = CLINESSDAI_W[d.id] || 0; });
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('essdai','ESSDAI / ClinESSDAI',
+  "The clinician-scored systemic disease activity index for primary Sjögren's disease, with a ClinESSDAI sub-tab (same domain levels, biological domain removed, re-weighted). Domain levels below are transcribed from the ESSDAI user guide (Seror et al. 2015) with numeric thresholds preserved where the source specifies them; some long explanatory/exclusion clauses are condensed — for full nuance and edge cases, consult the official user guide.",'activity',
+  `<div class="toggle-row">
+     <div class="toggle-btn active" id="essdai-btn-main" onclick="essdaiSetTab('main')">ESSDAI</div>
+     <div class="toggle-btn" id="essdai-btn-clin" onclick="essdaiSetTab('clin')">ClinESSDAI</div>
+   </div>
+   <div class="hint" id="essdai-tab-note" style="margin-top:10px;">Domain levels are shared by both tabs — score once, then switch tabs to read ESSDAI or ClinESSDAI.</div>
+   <div class="grid single">
+   ${ESSDAI_DOMAINS.map(d=>`<div class="field full" id="essdai-field-${d.id}"><label>${d.name} <span class="hint">(weight ×<span id="essdai-w-${d.id}">${d.weight}</span>)</span></label>
      <select id="essdai-${d.id}" onchange="essdaiCalc()">${d.levels.map(l=>`<option value="${l[0]}">${l[1]}</option>`).join('')}</select></div>`).join('')}
    </div>`,
   `<div><div class="score" id="essdai-score">0<small>Total ESSDAI (0–123)</small></div></div><span class="pill neutral" id="essdai-pill">Enter values</span>`,
-  'Low activity &lt;5 · Moderate 5–13 · High ≥14. Domain score = level × weight; total = sum of all 12 domains. Central nervous system has no "Low" level (jumps 0→2→3); Constitutional, Glandular and Biological have no "High" level (only 0/1/2).',
-  "Seror R, Ravaud P, Bowman SJ, et al. <i>Ann Rheum Dis.</i> 2010;69(6):1103–1109. Seror R, Bowman SJ, Brito-Zerón P, et al. ESSDAI user guide. <i>RMD Open.</i> 2015;1(1):e000022."
+  'ESSDAI: Low activity &lt;5 · Moderate 5–13 · High ≥14. Domain score = level × weight; total = sum of all 12 domains (0–123). ClinESSDAI: the same 11 clinical domains without the biological domain, re-weighted (Constitutional 4, Lymphadenopathy 4, Glandular 2, Articular 3, Cutaneous 3, Pulmonary 6, Renal 6, Muscular 7, PNS 5, CNS 5, Haematological 2; range 0–135); Low &lt;5 · Moderate ≥5 and &lt;14 · High ≥14. Minimal clinically important improvement: ≥3 points for both. Central nervous system has no "Low" level (jumps 0→2→3); Constitutional, Glandular and Biological have no "High" level (only 0/1/2).',
+  "Seror R, Ravaud P, Bowman SJ, et al. <i>Ann Rheum Dis.</i> 2010;69(6):1103–1109. Seror R, Bowman SJ, Brito-Zerón P, et al. ESSDAI user guide. <i>RMD Open.</i> 2015;1(1):e000022. Seror R, Meiners P, Baron G, et al. Development of the ClinESSDAI: a clinical score without biological domain. A tool for biological studies. <i>Ann Rheum Dis.</i> 2016;75(11):2046–2049."
 ));
+window._essdaiTab = 'main';
+function essdaiSetTab(tab){
+  window._essdaiTab = tab;
+  document.getElementById('essdai-btn-main').classList.toggle('active', tab==='main');
+  document.getElementById('essdai-btn-clin').classList.toggle('active', tab==='clin');
+  document.getElementById('essdai-field-bio').style.display = tab==='clin' ? 'none' : '';
+  ESSDAI_DOMAINS.forEach(d=>{ const w = document.getElementById('essdai-w-'+d.id); if(w) w.textContent = tab==='clin' ? d.clinW : d.weight; });
+  essdaiCalc();
+  if(typeof UX!=='undefined') UX.sync(document.getElementById('panel-essdai'));   /* refresh per-domain point chips */
+}
+function essdaiScores(){
+  let total = 0, clin = 0;
+  ESSDAI_DOMAINS.forEach(d=>{ const lv = +document.getElementById('essdai-'+d.id).value||0; total += lv*d.weight; clin += lv*d.clinW; });
+  return {total, clin};
+}
 function essdaiCalc(){
-  let total = 0;
-  ESSDAI_DOMAINS.forEach(d=>{ total += (+document.getElementById('essdai-'+d.id).value||0) * d.weight; });
-  document.getElementById('essdai-score').innerHTML = total+'<small>Total ESSDAI (0–123)</small>';
+  const {total, clin} = essdaiScores();
+  const isClin = window._essdaiTab==='clin';
+  const v = isClin ? clin : total;
+  document.getElementById('essdai-score').innerHTML = v+(isClin ? '<small>ClinESSDAI (0–135) · ESSDAI '+total+'</small>' : '<small>Total ESSDAI (0–123) · ClinESSDAI '+clin+'</small>');
   const pill = document.getElementById('essdai-pill');
   let level, label;
-  if(total<5){ level='green'; label='Low activity'; }
-  else if(total<=13){ level='orange'; label='Moderate activity'; }
+  if(v<5){ level='green'; label='Low activity'; }
+  else if(v<14){ level='orange'; label='Moderate activity'; }
   else { level='red'; label='High activity'; }
   pill.className = 'pill '+level;
-  pill.textContent = label+' (ESSDAI '+total+')';
+  pill.textContent = label+' ('+(isClin?'ClinESSDAI ':'ESSDAI ')+v+')';
 }
 essdaiCalc();
 
@@ -3359,7 +3395,7 @@ const CRESS_DOMAINS = [
   {id:'d4', label:'Salivary: unstimulated whole salivary flow increase ≥25% (or salivary gland ultrasonography score decrease ≥25%)'},
   {id:'d5', label:'Serology: rheumatoid factor decrease ≥25% OR IgG decrease ≥10%'},
 ];
-panelsRoot.insertAdjacentHTML('beforeend', panelShell('cress','CRESS',
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('cress','CRESS / STAR',
   "Composite of Relevant Endpoints for Sjögren's Syndrome — a 5-domain treatment-response index; a patient is a responder if ≥3 of 5 domains are met at follow-up versus baseline.",'activity',
   `${CRESS_DOMAINS.map(d=>`<div class="check-item"><input type="checkbox" id="cress-${d.id}" data-w="1" onchange="cressCalc()"><label for="cress-${d.id}">${d.label}</label></div>`).join('')}`,
   `<div><div class="score" id="cress-score">0<small>Domains met (of 5)</small></div></div><span class="pill neutral" id="cress-pill">Enter values</span>`,
@@ -3374,6 +3410,109 @@ function cressCalc(){
   pill.textContent = total>=3 ? 'CRESS responder ('+total+'/5 domains met)' : 'Not a CRESS responder ('+total+'/5 domains met)';
 }
 cressCalc();
+
+/* =========================================================
+   37b. STAR — Sjögren's Tool for Assessing Response
+   (Seror R, et al. Ann Rheum Dis 2022; NECESSITY consortium)
+   5 weighted domains, baseline vs follow-up; responder = STAR ≥5 of 9.
+========================================================= */
+const starPair = (id, label, unit, step) => `
+  <div class="field"><label>${label} — baseline <span class="hint">${unit}</span></label><input type="number" id="star-${id}-b" min="0" step="${step}" placeholder="baseline" oninput="starCalc()"></div>
+  <div class="field"><label>${label} — follow-up <span class="hint">${unit}</span></label><input type="number" id="star-${id}-f" min="0" step="${step}" placeholder="follow-up" oninput="starCalc()"></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('star','CRESS / STAR',
+  "Sjögren's Tool for Assessing Response — a weighted 5-domain composite comparing a follow-up visit with baseline (developed by the NECESSITY consortium as a trial endpoint). Enter baseline and follow-up values; domains left blank score 0 (not assessed).",'activity',
+  `<fieldset style="margin-top:14px;"><legend>1. Systemic activity — ClinESSDAI decrease ≥3 <span class="dom-badge zero" id="star-b1">0</span></legend>
+     <div class="grid">${starPair('clin','ClinESSDAI','0–135','1')}</div>
+     <button type="button" class="star-pull" onclick="starPull('clin')">↳ Use the current ClinESSDAI from the ESSDAI / ClinESSDAI page as follow-up</button>
+   </fieldset>
+   <fieldset style="margin-top:12px;"><legend>2. Patient symptoms — ESSPRI decrease ≥1 point or ≥15% <span class="dom-badge zero" id="star-b2">0</span></legend>
+     <div class="grid">${starPair('esspri','ESSPRI','0–10','0.1')}</div>
+     <button type="button" class="star-pull" onclick="starPull('esspri')">↳ Use the current ESSPRI from the ESSPRI page as follow-up</button>
+   </fieldset>
+   <fieldset style="margin-top:12px;"><legend>3. Lachrymal gland function — Schirmer OR ocular staining score <span class="dom-badge zero" id="star-b3">0</span></legend>
+     <div class="hint" style="margin-top:8px;">Mean of both eyes. Schirmer’s test without anaesthesia, abnormal if &lt;5 mm; ocular staining score abnormal if ≥3. Baseline status is determined automatically from these cut-offs.</div>
+     <div class="grid">${starPair('sch','Schirmer’s test','mm/5 min','0.5')}</div>
+     <div class="hint" id="star-sch-rule" style="margin-top:6px;"></div>
+     <div class="grid">${starPair('oss','Ocular staining score','0–12','0.5')}</div>
+     <div class="hint" id="star-oss-rule" style="margin-top:6px;"></div>
+   </fieldset>
+   <fieldset style="margin-top:12px;"><legend>4. Salivary gland function — unstimulated salivary flow OR ultrasound <span class="dom-badge zero" id="star-b4">0</span></legend>
+     <div class="grid">${starPair('uws','Unstimulated whole salivary flow','mL/min','0.01')}</div>
+     <div class="grid">${starPair('us','Salivary gland ultrasound (optional)','total Hocevar score','1')}</div>
+     <div class="hint" style="margin-top:6px;">UWSF: use one collection protocol (5 or 15 min) consistently at both visits — morning, fixed time, no eating/drinking/smoking for 60 min and no morning secretagogue dose before collection.</div>
+   </fieldset>
+   <fieldset style="margin-top:12px;"><legend>5. Biological — serum IgG decrease ≥10% OR RF decrease ≥25% <span class="dom-badge zero" id="star-b5">0</span></legend>
+     <div class="grid">${starPair('igg','Serum IgG','g/L','0.1')}</div>
+     <div class="grid">${starPair('rf','Rheumatoid factor','IU/mL','1')}</div>
+   </fieldset>`,
+  `<div><div class="score" id="star-score">0<small>STAR (0–9)</small></div></div><span class="pill neutral" id="star-pill">Enter values</span>`,
+  '<b>Scoring</b> — Systemic activity: ClinESSDAI decrease ≥3 → 3 points. Patient symptoms: ESSPRI decrease ≥1 point or ≥15% → 3 points. Lachrymal gland function (1 point): Schirmer’s test — if abnormal at baseline, increase ≥5 mm; if normal at baseline, no change to abnormal — OR ocular staining score — if abnormal at baseline, decrease ≥2 points; if normal at baseline, no change to abnormal. Salivary gland function (1 point): unstimulated whole salivary flow — if &gt;0 at baseline, increase ≥25%; if 0 at baseline, any increase from 0 — OR ultrasound: decrease ≥25% in total Hocevar score. Biological (1 point): serum IgG decrease ≥10% OR rheumatoid factor (total or IgM, IU/mL) decrease ≥25%. <b>Candidate STAR responder = total ≥5 of 9</b> — so at least one of the two major domains (systemic activity or patient-reported outcome) must improve. Ocular tests: Schirmer’s test without anaesthesia, abnormal if &lt;5 mm; ocular staining score abnormal if ≥3; mean of both eyes. Transcribed from Table 3 of Seror et al. 2022. STAR was developed as an efficacy endpoint for clinical trials.',
+  "Seror R, Baron G, Camus M, et al. Development and preliminary validation of the Sjögren's Tool for Assessing Response (STAR): a consensual composite score for assessing treatment effect in primary Sjögren's syndrome. <i>Ann Rheum Dis.</i> 2022;81(7):979–989."
+));
+function starNum(id){ const el = document.getElementById(id); return (el && el.value!=='' && isFinite(+el.value)) ? +el.value : null; }
+function starPull(which){
+  const el = document.getElementById(which==='clin' ? 'star-clin-f' : 'star-esspri-f');
+  if(which==='clin') el.value = essdaiScores().clin;
+  else el.value = roundTo((+document.getElementById('esspri-dry').value + +document.getElementById('esspri-fat').value + +document.getElementById('esspri-pain').value)/3, 1);
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function starCalc(){
+  const pct = (b,f) => roundTo((f-b)/b*100, 1);          /* % change from baseline (negative = decrease) */
+  const d = [];
+  /* 1. ClinESSDAI */
+  { const b = starNum('star-clin-b'), f = starNum('star-clin-f');
+    d.push({n:'Systemic (ClinESSDAI)', w:3, set:b!==null&&f!==null, met: b!==null&&f!==null && roundTo(b-f,2)>=3}); }
+  /* 2. ESSPRI */
+  { const b = starNum('star-esspri-b'), f = starNum('star-esspri-f'), set = b!==null&&f!==null;
+    d.push({n:'Symptoms (ESSPRI)', w:3, set, met: set && (roundTo(b-f,2)>=1 || (b>0 && pct(b,f)<=-15))}); }
+  /* 3. Lachrymal: Schirmer OR OSS */
+  /* Table 3 footnote: Schirmer (no anaesthesia) abnormal if <5 mm; OSS abnormal if ≥3; mean of both eyes */
+  { let set=false, met=false;
+    const schRule = document.getElementById('star-sch-rule'), ossRule = document.getElementById('star-oss-rule');
+    schRule.textContent = ''; ossRule.textContent = '';
+    const sb=starNum('star-sch-b'), sf=starNum('star-sch-f');
+    if(sb!==null&&sf!==null){
+      set=true;
+      const ok = sb<5 ? roundTo(sf-sb,2)>=5 : sf>=5;
+      if(ok) met=true;
+      schRule.textContent = (sb<5 ? 'Abnormal at baseline (<5 mm) → needs increase ≥5 mm' : 'Normal at baseline (≥5 mm) → needs no change to abnormal (<5 mm)')+' — '+(ok?'✓ met':'✗ not met');
+    }
+    const ob=starNum('star-oss-b'), of=starNum('star-oss-f');
+    if(ob!==null&&of!==null){
+      set=true;
+      const ok = ob>=3 ? roundTo(ob-of,2)>=2 : of<3;
+      if(ok) met=true;
+      ossRule.textContent = (ob>=3 ? 'Abnormal at baseline (≥3) → needs decrease ≥2 points' : 'Normal at baseline (<3) → needs no change to abnormal (≥3)')+' — '+(ok?'✓ met':'✗ not met');
+    }
+    d.push({n:'Lachrymal', w:1, set, met}); }
+  /* 4. Salivary: UWS OR ultrasound */
+  { let set=false, met=false;
+    const b=starNum('star-uws-b'), f=starNum('star-uws-f');
+    if(b!==null&&f!==null){ set=true; if(b>0 ? pct(b,f)>=25 : f>0) met=true; }
+    const ub=starNum('star-us-b'), uf=starNum('star-us-f');
+    if(ub!==null&&uf!==null&&ub>0){ set=true; if(pct(ub,uf)<=-25) met=true; }
+    d.push({n:'Salivary', w:1, set, met}); }
+  /* 5. Biological: IgG OR RF */
+  { let set=false, met=false;
+    const gb=starNum('star-igg-b'), gf=starNum('star-igg-f');
+    if(gb!==null&&gf!==null&&gb>0){ set=true; if(pct(gb,gf)<=-10) met=true; }
+    const rb=starNum('star-rf-b'), rf=starNum('star-rf-f');
+    if(rb!==null&&rf!==null&&rb>0){ set=true; if(pct(rb,rf)<=-25) met=true; }
+    d.push({n:'Biological', w:1, set, met}); }
+  let total = 0;
+  d.forEach((x,i)=>{
+    const pts = x.met ? x.w : 0; total += pts;
+    const b = document.getElementById('star-b'+(i+1));
+    b.textContent = x.met ? '+'+x.w+' pts ✓' : (x.set ? '0 pts' : 'not assessed');
+    b.classList.toggle('zero', !x.met);
+  });
+  document.getElementById('star-score').innerHTML = total+'<small>STAR (0–9) · '+d.map(x=>(x.met?'✓ ':(x.set?'✗ ':'– '))+x.n).join(' · ')+'</small>';
+  const pill = document.getElementById('star-pill');
+  if(!d.some(x=>x.set)){ pill.className='pill neutral'; pill.textContent='Enter baseline and follow-up values'; return; }
+  pill.className = total>=5 ? 'pill green' : 'pill neutral';
+  pill.textContent = total>=5 ? 'STAR responder ('+total+'/9, ≥5)' : 'Not a STAR responder ('+total+'/9, need ≥5)';
+}
+starCalc();
 
 /* =========================================================
    38. Inflammatory Back Pain Criteria (Calin / Berlin / ASAS)
@@ -4471,6 +4610,18 @@ appendRefTable('aps2023', `
   </tbody></table>
   <p class="hint">Moderate titer = 40–79 units; high titer = ≥80 units (standardized ELISA). Only the highest item per domain counts. Barbhaiya M, Zuily S, Naden R, et al. 2023 ACR/EULAR APS classification criteria. <i>Arthritis Rheumatol.</i> 2023;75(10):1687–1702.</p>`);
 
+appendRefTable('aps2006', `
+  <table><caption>2006 revised Sapporo (Sydney) classification criteria for APS — ≥1 clinical AND ≥1 laboratory criterion</caption>
+  <thead><tr><th>Type</th><th>Criterion</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2">Clinical</td><td>1. Vascular thrombosis — ≥1 arterial, venous or small-vessel thrombosis, objectively confirmed (imaging/histopathology without significant vessel-wall inflammation)</td></tr>
+    <tr><td>2. Pregnancy morbidity — (a) ≥1 unexplained fetal death ≥10 weeks, morphologically normal fetus; (b) ≥1 premature birth &lt;34 weeks due to eclampsia/severe pre-eclampsia or placental insufficiency; (c) ≥3 unexplained consecutive spontaneous abortions &lt;10 weeks (anatomic, hormonal and chromosomal causes excluded)</td></tr>
+    <tr><td rowspan="3">Laboratory<br><span class="hint">≥2 occasions ≥12 weeks apart</span></td><td>1. Lupus anticoagulant (ISTH guidelines)</td></tr>
+    <tr><td>2. aCL IgG and/or IgM, medium/high titre (&gt;40 GPL/MPL or &gt;99th percentile), standardized ELISA</td></tr>
+    <tr><td>3. Anti-β2GPI IgG and/or IgM &gt;99th percentile, standardized ELISA</td></tr>
+  </tbody></table>
+  <p class="hint">Not classified as APS if &lt;12 weeks or &gt;5 years separate the positive aPL test and the clinical manifestation. Lab categories: I = &gt;1 lab criterion; IIa = LA only; IIb = aCL only; IIc = anti-β2GPI only. Miyakis S, et al. <i>J Thromb Haemost.</i> 2006;4(2):295–306.</p>`);
+
 appendRefTable('axspa', `
   <table><caption>ASAS axial SpA classification criteria (2009) — applies to back pain ≥3 months, age at onset &lt;45y</caption>
   <thead><tr><th>Arm</th><th>Requirement</th></tr></thead>
@@ -5107,7 +5258,7 @@ const UX = (function(){
     'lnpath-ai-crescents': v => (+v||0)*2,
     'cdasi-gh-ery': v => (+v||0) * (document.getElementById('cdasi-gh-papules').checked ? 2 : 1), /* = cdasiCalc */
   };
-  ESSDAI_DOMAINS.forEach(d=>{ OPT_PTS['essdai-'+d.id] = v => (+v||0)*d.weight; });          /* = essdaiCalc */
+  ESSDAI_DOMAINS.forEach(d=>{ OPT_PTS['essdai-'+d.id] = v => (+v||0)*(window._essdaiTab==='clin' ? d.clinW : d.weight); });   /* = essdaiCalc (ESSDAI or ClinESSDAI tab) */
   const CHK_PTS = {
     'clasi-hairloss': ()=>1,     /* clasiCalc: act += hairloss ? 1 : 0 */
     'cdasi-alopecia': ()=>1,     /* cdasiCalc: act += alopecia ? 1 : 0 */
@@ -5508,37 +5659,40 @@ const RESET = (function(){
 <script>
 /* =========================================================
    APP SHELL (2026/09/30) — navigation layer only.
-   • Wraps the existing showCalc()/goHome() so every link, tile and
-     version tab keeps working, but moves go through the browser history
-     (Android back gesture / iOS swipe-back return to the previous screen).
-   • Favourites & recents store calculator NAMES only (no patient input),
-     in this device's browser; everything keeps working if storage is blocked.
-   • Floating result bar mirrors the calculator's own .result box
-     (read-only copy of what the calculator already displays).
+   • 依類型 (criteria / activity), 依疾病 (by disease) and 收藏 favourites.
+   • Wraps showCalc()/goHome() so every tile, version tab and back
+     button goes through browser history (phone back gesture works).
+   • Favourites store calculator names only, in this browser.
 ========================================================= */
 const APP = (function(){
   const GROUPS = [
-    {key:'sle', zh:'紅斑性狼瘡',             en:'SLE',          kw:'狼瘡 lupus',                    ids:['g-sle','sledai','easybilag','clasi','lnpath']},
-    {key:'sjd', zh:'乾燥症',                 en:'Sjögren',      kw:'修格蘭 sjogren sicca',          ids:['g-sjogren','essdai','esspri','cress']},
-    {key:'ssc', zh:'全身性硬化症與 MCTD',     en:'SSc / MCTD',   kw:'硬皮症 scleroderma 混合結締組織', ids:['ssc2013','mrss','mctd']},
-    {key:'iim', zh:'發炎性肌病變',            en:'Myositis',     kw:'肌炎 皮肌炎 myositis dermatomyositis', ids:['iim2017','assd2025','cdasi','mmt8']},
-    {key:'ra',  zh:'類風濕性關節炎',          en:'RA',           kw:'類風濕 關節炎 超音波 ultrasound', ids:['acreular2010','das28','cdai','gloess']},
-    {key:'spa', zh:'脊椎關節炎與乾癬性關節炎', en:'SpA / PsA',    kw:'僵直性脊椎炎 乾癬 背痛',          ids:['g-spa','ibp','basdai','asdas','caspar','dapsa']},
-    {key:'vas', zh:'血管炎與 PMR',            en:'Vasculitis',   kw:'血管炎 風濕性多肌痛 貝西氏',       ids:['gpa2022','mpa2022','egpa2022','gca2022','tak2022','pmr2012','pan1990','cryovasc','g-iga','behcet','ffs','bvas']},
-    {key:'oth', zh:'其他',                   en:'Others',       kw:'痛風 抗磷脂 類肉瘤',             ids:['gout2015','aps2023','g-igg4','ipaf','aosd','sarcoid']},
+    {key:'sle', zh:'紅斑性狼瘡',          en:'SLE',          kw:'狼瘡 紅斑 lupus',                                  ids:['g-sle','sledai','easybilag','clasi','lnpath']},
+    {key:'sjd', zh:'乾燥症',              en:'Sjögren',      kw:'修格蘭 乾燥 sjogren sicca clinessdai star',         ids:['g-sjogren','essdai','esspri','g-cress']},
+    {key:'ssc', zh:'全身性硬化症 / MCTD',  en:'SSc / MCTD',   kw:'硬皮症 混合結締組織 scleroderma',                    ids:['ssc2013','mrss','mctd']},
+    {key:'iim', zh:'肌炎 + IPAF',         en:'IIM + IPAF',   kw:'肌炎 皮肌炎 抗合成酶 間質性肺病 myositis dermatomyositis ild', ids:['iim2017','assd2025','cdasi','mmt8','ipaf']},
+    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 ra spa psa gout', ids:['acreular2010','das28','cdai','gloess','g-spa','ibp','basdai','asdas','caspar','dapsa','gout2015']},
+    {key:'vas', zh:'血管炎（含 PMR）',     en:'Vasculitis',   kw:'血管炎 風濕性多肌痛 貝西氏 巨細胞 高安 冷凝球蛋白 vasculitis pmr', ids:['gpa2022','mpa2022','egpa2022','gca2022','tak2022','pmr2012','pan1990','cryovasc','g-iga','behcet','ffs','bvas']},
+    {key:'oth', zh:'其他',                en:'Others',       kw:'抗磷脂 成人史笛爾 類肉瘤 aps still sarcoidosis',       ids:['g-aps','g-igg4','aosd','sarcoid']},
   ];
-  const TAG = {criteria:'分類／診斷標準', activity:'疾病活動度'};
+  const TYPES = [
+    {cat:'criteria', zh:'分類／診斷標準', en:'Classification criteria', color:'var(--teal)'},
+    {cat:'activity', zh:'疾病活動度',     en:'Disease activity scores', color:'var(--blue)'},
+  ];
+  const TAG = {criteria:'分類標準', activity:'疾病活動度'};
+  const VIEWS = [
+    ['type',    '依類型', 'By type',    'type'],
+    ['disease', '依疾病', 'By disease', 'disease'],
+    ['fav',     '收藏',   'Favorites',  'star'],
+  ];
   const ICON = {
-    home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/>',
-    search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>',
+    type:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>',
+    disease:'<path d="M3 12h4l2.2-5.5 4.2 11 2.3-5.5H21"/>',
     star:'<path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z"/>',
-    recent:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
-    back:'<path d="M15 5l-7 7 7 7"/>',
-    chev:'<path d="M9 5l7 7-7 7"/>',
     down:'<path d="M6 9l6 6 6-6"/>',
   };
-  const svg = (k,extra='') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${ICON[k]}</svg>`;
+  const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const $ = id => document.getElementById(id);
 
   /* ---------- catalogue ---------- */
   const ENTRIES = navEntries();
@@ -5547,118 +5701,100 @@ const APP = (function(){
   GROUPS.forEach(g=>{ g.items=[]; g.ids.forEach(id=>{ if(BY_ID[id]){ g.items.push(BY_ID[id]); GROUP_BY[id]=g; } }); });
   const OTHER = GROUPS[GROUPS.length-1];
   ENTRIES.forEach(e=>{ if(!GROUP_BY[e.id]){ OTHER.items.push(e); GROUP_BY[e.id]=OTHER; } });   /* nothing can go missing */
-  ENTRIES.forEach(e=>{ const g=GROUP_BY[e.id]; e.appSearch = (e.search+' '+g.zh+' '+g.en+' '+g.kw).toLowerCase(); });
+  /* criteria before activity scores within each disease, otherwise registry order */
+  GROUPS.forEach(g=>{ g.items = g.items.filter(e=>e.cat==='criteria').concat(g.items.filter(e=>e.cat!=='criteria')); });
+  const ORDERED = GROUPS.flatMap(g=>g.items);
+  ENTRIES.forEach(e=>{ const g=GROUP_BY[e.id]; e.appSearch = (e.search+' '+g.zh+' '+g.en+' '+g.kw+' '+TAG[e.cat]).toLowerCase(); });
   const entryOf = calcId => (GROUP_OF[calcId] ? GROUP_OF[calcId].id : calcId);
   const isValid = id => !!BY_ID[id] || CALCS.some(c=>c.id===id);
 
-  /* ---------- storage (names only) ---------- */
+  /* ---------- storage (names only; works without it) ---------- */
   const mem = {};
   const store = {
-    get(k){ try{ const v = localStorage.getItem(k); if(v) return JSON.parse(v); }catch(e){} return mem[k] || []; },
+    get(k,d){ try{ const v = localStorage.getItem(k); if(v!==null) return JSON.parse(v); }catch(e){} return k in mem ? mem[k] : d; },
     set(k,v){ mem[k]=v; try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   };
-  const FAV='rheumcalc.fav', REC='rheumcalc.recent';
-  const favs = ()=> store.get(FAV).filter(id=>BY_ID[id]);
-  const recents = ()=> store.get(REC).filter(id=>BY_ID[id]);
+  const FAV='rheumcalc.fav', LASTVIEW='rheumcalc.view';
+  const favs = ()=> (store.get(FAV,[])||[]).filter(id=>BY_ID[id]);
   const isFav = id => favs().includes(id);
-  function toggleFav(id){ const f=favs(); const i=f.indexOf(id); if(i>=0) f.splice(i,1); else f.unshift(id); store.set(FAV,f); }
-  function addRecent(id){ const r=recents().filter(x=>x!==id); r.unshift(id); store.set(REC, r.slice(0,12)); }
+  function toggleFav(id){ const f=favs(); const i=f.indexOf(id); if(i>=0) f.splice(i,1); else f.push(id); store.set(FAV,f); }
 
-  /* ---------- DOM ---------- */
-  document.body.classList.add('app');
-  const NAV = [['home','首頁','home'],['search','搜尋','search'],['fav','收藏','star'],['recent','最近','recent']];
-  document.body.insertAdjacentHTML('afterbegin', `
-    <div class="app-bar" role="banner"><div class="ab-in">
-      <button class="ab-btn ab-back" type="button" aria-label="返回">${svg('back','style="width:24px;height:24px"')}</button>
-      <div class="ab-logo" aria-hidden="true">R+</div>
-      <div class="ab-title"><div class="ab-t1" id="abT1">RheumCalc</div><div class="ab-t2" id="abT2">風濕免疫科臨床計算器</div></div>
-      <nav class="ab-nav" aria-label="主要導覽">${NAV.map(([v,l])=>`<button type="button" data-go="${v}">${l}</button>`).join('')}</nav>
-      <button class="ab-btn ab-star" type="button" aria-pressed="false" aria-label="加入收藏">${svg('star')}</button>
-    </div></div>`);
+  /* ---------- chrome: tabs, per-calculator star, result bar ---------- */
+  $('topTabs').innerHTML = VIEWS.map(([v,zh,,ic])=>`<button type="button" data-go="${v}">${svg(ic)}${zh}</button>`).join('');
   document.body.insertAdjacentHTML('beforeend', `
-    <nav class="tab-bar" aria-label="主要導覽">${NAV.map(([v,l,ic])=>`<button type="button" data-go="${v}">${svg(ic)}<span>${l}</span></button>`).join('')}</nav>
+    <nav class="tab-bar" aria-label="主要導覽">${VIEWS.map(([v,zh,,ic])=>`<button type="button" data-go="${v}">${svg(ic)}<span>${zh}</span></button>`).join('')}</nav>
     <button class="res-bar" type="button" hidden aria-label="捲動到完整結果"></button>`);
-  const main = document.querySelector('main');
-  main.insertAdjacentHTML('afterbegin', `
-    <section class="view" id="v-home" aria-label="首頁"></section>
-    <section class="view" id="v-search" aria-label="搜尋">
-      <div class="search-wrap"><label class="search-field">${svg('search')}
-        <input id="appSearch" type="search" placeholder="名稱、縮寫或疾病，例如 DAS28、狼瘡" autocomplete="off" enterkeyhint="search" aria-label="搜尋計算器"></label></div>
-      <div id="searchOut"></div>
-    </section>
-    <section class="view" id="v-fav" aria-label="收藏"></section>
-    <section class="view" id="v-recent" aria-label="最近使用"></section>`);
-  const $ = id => document.getElementById(id);
+  CALCS.forEach(c=>{
+    const acts = document.querySelector('#panel-'+c.id+' .calc-actions'); if(!acts) return;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'calc-fav'; b.dataset.fav = entryOf(c.id);
+    b.innerHTML = svg('star')+'<span>收藏</span>';
+    acts.prepend(b);
+  });
   const bar = document.querySelector('.res-bar');
-  const starBtn = document.querySelector('.ab-star');
 
   /* ---------- list rendering ---------- */
   function row(e, showGroup){
-    const g = GROUP_BY[e.id];
-    return `<button class="row" type="button" data-open="${e.id}">
-      <span class="row-main">
-        <span class="row-nm">${esc(e.name)}${isFav(e.id)?'<span class="row-star" aria-label="已收藏">★</span>':''}</span>
-        ${showGroup?`<span class="row-grp" style="color:var(--c-${g.key})">${g.zh}</span>`:''}
-        <span class="row-ds">${esc(e.short)}</span>
-      </span>
-      <span class="row-tag ${e.cat}">${TAG[e.cat]}</span>${svg('chev','class="row-chev"')}
-    </button>`;
+    const g = GROUP_BY[e.id], on = isFav(e.id);
+    return `<div class="row">
+      <button class="row-open" type="button" data-open="${e.id}">
+        <span class="row-main">
+          <span class="row-nm">${esc(e.name)}</span>
+          ${showGroup?`<span class="row-grp" style="color:var(--c-${g.key})">${esc(g.zh)}</span>`:''}
+          <span class="row-ds">${esc(e.short)}</span>
+        </span>
+        <span class="row-tag ${e.cat}">${TAG[e.cat]}</span>
+      </button>
+      <button class="row-fav" type="button" data-fav="${e.id}" aria-pressed="${on}" aria-label="${on?'取消收藏':'加入收藏'}：${esc(e.name)}">${svg('star')}</button>
+    </div>`;
   }
-  function renderHome(){
-    const f = favs();
-    const favSec = f.length ? `<section class="app-sec"><h2 class="app-sec-h"><span class="grp-chip" style="background:#c99a06">★</span>收藏<span class="n">${f.length}</span></h2>
-      <div class="rows">${f.map(id=>row(BY_ID[id], true)).join('')}</div></section>` : '';
-    $('v-home').innerHTML = `
-      <button class="home-search" type="button" data-go="search">${svg('search')}搜尋計算器、疾病或縮寫</button>
-      ${favSec}
-      <div class="grp-wrap">${GROUPS.filter(g=>g.items.length).map(g=>`
-        <section class="app-sec"><h2 class="app-sec-h"><span class="grp-chip" style="background:var(--c-${g.key})">${esc(g.en)}</span>${g.zh}<span class="n">${g.items.length} 項</span></h2>
-          <div class="rows">${g.items.map(e=>row(e,false)).join('')}</div></section>`).join('')}</div>
-      <div class="about">
-        <div class="credit-line">計算器內容：produced by <b>Kaku</b> from <b>NTUH</b>, 2026/09/28 version</div>
-        <div>App 介面版：2026/09/30</div>
-        <details><summary>關於此版本與修訂紀錄</summary>
-          <p>收藏與最近使用只記錄計算器名稱，存在這台裝置的瀏覽器裡，不會儲存任何輸入的病人數值。</p>
-          <table><thead><tr><th>日期</th><th>版本</th><th>修訂內容</th></tr></thead><tbody>
-            <tr><td>2026/09/28</td><td>原始版</td><td>計算器內容與計分邏輯（Kaku, NTUH）。</td></tr>
-            <tr><td>2026/09/30</td><td>App 介面版</td><td>新增 app 式導覽：依疾病分組首頁、底部分頁（首頁／搜尋／收藏／最近）、全螢幕計算頁與返回手勢、浮動結果列、加入主畫面設定；導覽文字改繁體中文。計算器內容、計分公式與 cut-off 未更動。</td></tr>
-            <tr><td>2026/09/30</td><td>部署版</td><td>改為獨立網站部署：加入 manifest、app 圖示檔與 service worker（開啟過一次後可離線使用）。計算器內容未更動。</td></tr>
-          </tbody></table>
-        </details>
-      </div>`;
+  const sec = (chip, color, title, items, showGroup) => `<section class="app-sec">
+      <h3 class="app-sec-h"><span class="grp-chip" style="background:${color}">${esc(chip)}</span>${esc(title)}<span class="n">${items.length} 項</span></h3>
+      <div class="rows">${items.map(e=>row(e,showGroup)).join('')}</div></section>`;
+  function head(){
+    const v = VIEWS.find(x=>x[0]===view);
+    $('viewHead').innerHTML = v ? `<h2>${v[1]}</h2><span class="en">${v[2]}</span>` : '';
   }
-  function renderSearch(){
-    const q = $('appSearch').value.trim().toLowerCase();
-    const out = $('searchOut');
-    if(!q){ out.innerHTML = `<div class="empty">可輸入英文名稱、縮寫或中文疾病名。<br>例如 <b>BVAS</b>、<b>ASDAS</b>、<b>狼瘡</b>、<b>血管炎</b>。</div>`; return; }
-    const toks = q.split(/\s+/);
-    const hits = ENTRIES.filter(e=>toks.every(t=>e.appSearch.includes(t)));
-    out.innerHTML = hits.length
-      ? `<div class="rows">${hits.map(e=>row(e,true)).join('')}</div>`
+  function renderList(){
+    head();
+    const q = $('searchInput').value.trim().toLowerCase();
+    const toks = q ? q.split(/\s+/) : [];
+    const hit = e => toks.every(t=>e.appSearch.includes(t));
+    let html = '';
+    if(view==='type'){
+      html = TYPES.map(t=>{ const items = ORDERED.filter(e=>e.cat===t.cat && hit(e)); return items.length ? sec(t.en, t.color, t.zh, items, true) : ''; }).join('');
+    } else {
+      html = GROUPS.map(g=>{ const items = g.items.filter(hit); return items.length ? sec(g.en, `var(--c-${g.key})`, g.zh, items, false) : ''; }).join('');
+    }
+    $('homeList').innerHTML = html
+      ? `<div class="grp-wrap">${html}</div>`
       : `<div class="empty">找不到符合「${esc(q)}」的計算器。<br>試試縮寫（如 <b>BVAS</b>）或疾病名（如 <b>血管炎</b>）。</div>`;
   }
   function renderFav(){
+    head();
     const f = favs();
-    $('v-fav').innerHTML = `<h1 class="view-h">收藏</h1>` + (f.length
-      ? `<div class="rows">${f.map(id=>row(BY_ID[id],true)).join('')}</div>`
-      : `<div class="empty">還沒有收藏。<br>開啟任一計算器，點右上角的星號，就會出現在這裡。</div>`);
+    $('homeList').innerHTML = f.length
+      ? `<div class="rows">${f.map(id=>row(BY_ID[id], true)).join('')}</div>`
+      : `<div class="empty">還沒有收藏。<br>點列表右側或計算器頁面上的 <b>☆ 收藏</b>，就會出現在這裡。</div>`;
   }
-  function renderRecent(){
-    const r = recents();
-    $('v-recent').innerHTML = `<h1 class="view-h">最近使用</h1>` + (r.length
-      ? `<div class="rows">${r.map(id=>row(BY_ID[id],true)).join('')}</div>
-         <div class="list-actions"><button class="app-link" type="button" id="clearRecent">清除最近使用紀錄</button></div>`
-      : `<div class="empty">還沒有使用紀錄。<br>開啟過的計算器會依時間排在這裡。</div>`);
+  function syncFav(){
+    const f = favs();
+    document.querySelectorAll('[data-fav]').forEach(b=>{
+      const on = f.includes(b.dataset.fav);
+      b.setAttribute('aria-pressed', on);
+      if(b.classList.contains('calc-fav')){ b.querySelector('span').textContent = on ? '已收藏' : '收藏'; b.title = on ? '取消收藏' : '加入收藏'; }
+    });
   }
 
   /* ---------- router (history-based; back gesture works) ---------- */
-  let view = 'home', idx = 0, rendering = false;
+  let view = null, lastList = store.get(LASTVIEW,'type'), idx = 0, rendering = false, lastKey = '';
+  if(!VIEWS.some(v=>v[0]===lastList)) lastList = 'type';
   const scrollMem = {};
   function parse(){
     const [v,id] = location.hash.replace(/^#\/?/,'').split('/');
     if(v==='calc' && id && isValid(id)) return {v:'calc', id};
-    if(v==='search' || v==='fav' || v==='recent') return {v};
-    return {v:'home'};
+    if(VIEWS.some(x=>x[0]===v)) return {v};
+    return {v:lastList};
   }
   function go(path, replace){
     const h = '#/'+path;
@@ -5670,95 +5806,69 @@ const APP = (function(){
   }
   function render(){
     if(history.state && history.state.app) idx = history.state.i;
-    scrollMem[view] = window.scrollY;
     const r = parse();
+    const key = r.v+'/'+(r.id||'');
+    if(view && view!=='calc') scrollMem[view] = window.scrollY;
     rendering = true;
     try{
-      if(r.v==='calc'){
-        ORIG_SHOW(r.id);
-        view = 'calc';
-        addRecent(entryOf(activeId));
-      }else{
+      if(r.v==='calc'){ ORIG_SHOW(r.id); view = 'calc'; }
+      else{
         if(activeId) ORIG_HOME();
-        view = r.v;
-        if(view==='home') renderHome();
-        if(view==='search') renderSearch();
-        if(view==='fav') renderFav();
-        if(view==='recent') renderRecent();
+        view = lastList = r.v; store.set(LASTVIEW, view);
+        if(view==='fav') renderFav(); else renderList();
       }
     }finally{ rendering = false; }
+    lastKey = key;
     document.body.dataset.view = view;
     updateChrome();
-    if(view!=='calc'){
-      const y = scrollMem[view] || 0;
-      requestAnimationFrame(()=>window.scrollTo(0, y));
-      if(view==='search') setTimeout(()=>{ try{ $('appSearch').focus({preventScroll:true}); }catch(e){} }, 60);
-    }
-    watchResult();
+    if(view!=='calc'){ const y = scrollMem[view] || 0; requestAnimationFrame(()=>window.scrollTo(0, y)); }
+    schedule();
   }
   function updateChrome(){
-    document.querySelectorAll('[data-go]').forEach(b=>{
-      if(b.classList.contains('home-search')) return;
-      if(b.dataset.go===view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
-    });
-    if(view==='calc'){
-      const e = BY_ID[entryOf(activeId)] || {name:activeId};
-      const g = GROUP_BY[e.id];
-      $('abT1').textContent = e.name;
-      $('abT2').textContent = g ? g.zh+'　'+TAG[e.cat] : '';
-      const on = isFav(e.id);
-      starBtn.setAttribute('aria-pressed', on);
-      starBtn.setAttribute('aria-label', on ? '取消收藏' : '加入收藏');
-      document.title = e.name + ' — RheumCalc';
-    }else{
-      $('abT1').textContent = 'RheumCalc';
-      $('abT2').textContent = '風濕免疫科臨床計算器';
-      document.title = 'RheumCalc — Rheumatology Clinical Calculators';
-    }
+    const cur = view==='calc' ? lastList : view;
+    document.querySelectorAll('[data-go]').forEach(b=>{ if(b.dataset.go===cur) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+    syncFav();
+    if(view==='calc'){ const e = BY_ID[entryOf(activeId)]; document.title = (e?e.name:activeId)+' — RheumCalc'; }
+    else document.title = 'RheumCalc — Rheumatology Clinical Calculators';
+  }
+  function back(){
+    if(history.state && history.state.app && history.state.i > 0) history.back();
+    else go(lastList, true);
   }
 
-  /* Wrap the original navigation so every existing link/tab goes through the router */
+  /* Wrap the original navigation so every existing link / version tab / back button goes through the router */
   const ORIG_SHOW = showCalc, ORIG_HOME = goHome;
   showCalc = function(id){
     if(rendering) return ORIG_SHOW(id);
-    const cur = parse();
-    const sameGroup = cur.v==='calc' && activeId && GROUP_OF[id] && GROUP_OF[activeId] === GROUP_OF[id];
-    go('calc/'+id, sameGroup);            /* version tab switch = replace, so Back returns to the list */
+    const grp = CALC_GROUPS.find(g=>g.id===id); if(grp) id = grp.last;
+    const sameGroup = view==='calc' && activeId && GROUP_OF[id] && GROUP_OF[activeId]===GROUP_OF[id];
+    go('calc/'+id, sameGroup);            /* version-tab switch replaces, so Back returns to the list */
   };
-  goHome = function(){ if(rendering) return ORIG_HOME(); go('home'); };
-
-  function back(){
-    if(history.state && history.state.app && history.state.i > 0) history.back();
-    else go('home', true);
-  }
+  goHome = function(){ if(rendering) return ORIG_HOME(); back(); };
 
   /* ---------- events ---------- */
   document.addEventListener('click', ev=>{
+    const f = ev.target.closest('[data-fav]');
+    if(f){ ev.preventDefault(); toggleFav(f.dataset.fav); syncFav(); if(view==='fav') renderFav(); return; }
     const o = ev.target.closest('[data-open]');
     if(o){ ev.preventDefault(); showCalc(o.dataset.open); return; }
     const g = ev.target.closest('[data-go]');
     if(g){
       ev.preventDefault();
-      if(g.dataset.go===view){ window.scrollTo({top:0, behavior:'smooth'}); if(view==='search') $('appSearch').focus(); return; }
-      go(g.dataset.go==='home' ? '' : g.dataset.go); return;
-    }
-    if(ev.target.closest('#clearRecent')){
-      if(confirm('清除所有最近使用紀錄？（收藏不受影響）')){ store.set(REC, []); renderRecent(); }
+      if(g.dataset.go===view){ window.scrollTo({top:0, behavior:'smooth'}); return; }
+      go(g.dataset.go);
     }
   });
-  document.querySelector('.ab-back').addEventListener('click', back);
-  starBtn.addEventListener('click', ()=>{ toggleFav(entryOf(activeId)); updateChrome(); });
-  $('appSearch').addEventListener('input', renderSearch);
+  $('searchInput').addEventListener('input', ()=>{ if(view==='type' || view==='disease') renderList(); });
   window.addEventListener('popstate', render);
-  window.addEventListener('hashchange', ()=>{ if(!(history.state && history.state.app)) render(); });
+  window.addEventListener('hashchange', ()=>{ const r = parse(); if(r.v+'/'+(r.id||'') !== lastKey) render(); });
 
-  /* ---------- floating result bar ---------- */
+  /* ---------- floating result bar (read-only copy of the calculator's own result box) ---------- */
   const visible = el => !!(el && el.getClientRects().length && getComputedStyle(el).visibility!=='hidden');
   let target = null, targetOnScreen = false, raf = 0;
   const io = ('IntersectionObserver' in window) ? new IntersectionObserver(es=>{
     es.forEach(e=>{ if(e.target===target){ targetOnScreen = e.isIntersecting; bar.classList.toggle('off', targetOnScreen); } });
-  }, {rootMargin:'0px 0px -80px 0px'}) : null;
-
+  }, {rootMargin:'0px 0px -120px 0px'}) : null;
   function currentResult(){
     if(view!=='calc' || !activeId) return null;
     const panel = $('panel-'+activeId); if(!panel) return null;
@@ -5782,30 +5892,29 @@ const APP = (function(){
     if(!scores.length && !pill){ bar.hidden = true; return; }
     const tone = pill ? (['green','yellow','orange','red'].find(t=>pill.classList.contains(t)) || '') : '';
     bar.className = 'res-bar ' + tone + (targetOnScreen ? ' off' : '');
-    bar.innerHTML = `
-      ${scores.length ? `<span class="rb-scores">${scores.map(s=>`<span class="rb-s"><span class="rb-num">${esc(s.num)}</span>${s.lab?`<span class="rb-lab">${esc(s.lab)}</span>`:''}</span>`).join('')}</span>` : ''}
+    bar.innerHTML = `${scores.length ? `<span class="rb-scores">${scores.map(s=>`<span class="rb-s"><span class="rb-num">${esc(s.num)}</span>${s.lab?`<span class="rb-lab">${esc(s.lab)}</span>`:''}</span>`).join('')}</span>` : ''}
       <span class="rb-pill">${pill ? esc(pill.textContent.trim()) : ''}</span>
       <span class="rb-go">${svg('down')}<span>詳細</span></span>`;
     bar.hidden = false;
   }
   function schedule(){ if(!raf) raf = requestAnimationFrame(refreshBar); }
-  function watchResult(){ schedule(); }
   new MutationObserver(()=>{ if(view==='calc') schedule(); })
     .observe($('panels'), {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['class','style']});
   ['input','change','click'].forEach(t=>document.addEventListener(t, ()=>{ if(view==='calc') schedule(); }, true));
   window.addEventListener('resize', schedule);
   bar.addEventListener('click', ()=>{ if(target) target.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'center'}); });
 
-  /* ---------- offline support: service worker (only when served over http/https) ---------- */
-  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
-    window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
-  }
-
   /* ---------- start ---------- */
-  try{ history.replaceState({app:1, i:0}, '', location.hash || '#/'); }catch(e){}
+  try{ history.replaceState({app:1, i:0}, '', location.hash || '#/'+lastList); }catch(e){}
   render();
   return {go, back, GROUPS};
 })();
+</script>
+<script>
+/* Offline support: register the service worker (only when served over http/https, e.g. GitHub Pages) */
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
 </script>
 </body>
 </html>
