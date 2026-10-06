@@ -439,6 +439,45 @@
   fieldset.sle-imm{border-color:var(--green); background:#f3fbf6;}
   fieldset.sle-imm > legend{background:var(--green); color:#fff;}
   fieldset.sle-dom > legend .hint{color:#fff; opacity:.85;}
+  /* SDI / LLDAS / DORIS: framed domains with a large coloured title (SLE purple) */
+  fieldset.big-dom{border:2px solid #7a3fb0; border-radius:10px; background:#faf6fd; padding:12px 14px 12px; margin-top:14px;}
+  fieldset.big-dom > legend{background:#7a3fb0; color:#fff; border-radius:5px; padding:3px 10px; font-size:15px; font-weight:700;}
+  fieldset.big-dom > legend .dom-badge{background:#fff; border-color:#fff; color:#7a3fb0;}
+  fieldset.big-dom > legend .dom-badge.zero{background:rgba(255,255,255,.22); border-color:transparent; color:#fff;}
+  fieldset.big-dom .grid{margin-top:4px;}
+  /* same framed-domain pattern in the arthritis colour (RS3PE) */
+  fieldset.big-dom.art{border-color:#155ec7; background:#f4f8fe;}
+  fieldset.big-dom.art > legend{background:#155ec7;}
+  fieldset.big-dom.art > legend .dom-badge{color:#155ec7;}
+  fieldset.big-dom.soft{border-style:dashed; border-color:#9db8e3; background:#fbfcfe;}
+  fieldset.big-dom.soft > legend{background:#5b7fb8;}
+  /* CRESS / STAR: framed domains with a large coloured title (same pattern as SLE 2019) */
+  fieldset.cs-dom{border:2px solid #0f7a6b; border-radius:10px; background:#f3faf8; padding:12px 14px 12px; margin-top:14px;}
+  fieldset.cs-dom > legend{background:#0f7a6b; color:#fff; border-radius:5px; padding:3px 10px; font-size:15px; font-weight:700;}
+  .cs-res{margin-left:10px; font-size:12px; font-weight:700; padding:1px 9px; border-radius:10px; background:rgba(255,255,255,.2); white-space:nowrap;}
+  .cs-res.on{background:#fff; color:#0f7a6b;}
+  .cs-head, .cs-row{display:grid; grid-template-columns:minmax(150px,1.4fr) minmax(70px,1fr) 18px minmax(70px,1fr); gap:4px 8px; align-items:center;}
+  .cs-head{font-size:11px; font-weight:700; color:var(--ink-soft); margin:2px 0 2px;}
+  .cs-row{margin:7px 0;}
+  .cs-lbl{font-size:13.5px; font-weight:600; line-height:1.3;}
+  .cs-lbl .hint{display:block; font-size:11px; color:var(--ink-soft); font-weight:400;}
+  .cs-row input{padding:7px 9px; border:1px solid var(--line); border-radius:7px; font:inherit; font-size:14px; background:#fff; color:var(--ink); width:100%; min-width:0;}
+  .cs-row input:focus{outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue);}
+  .cs-row input.input-clamped{border-color:var(--red); background:var(--red-bg);}
+  .cs-arrow{text-align:center; color:var(--ink-soft);}
+  .cs-note{grid-column:2 / -1; font-size:11.5px; color:var(--ink-soft); margin-top:-1px;}
+  .cs-note:empty{display:none;}
+  .cs-note.ok{color:var(--green); font-weight:600;}
+  .cs-note.no{color:var(--red);}
+  .cs-req{margin-top:8px; padding-top:7px; border-top:1px dashed #b5d8d0; font-size:11.5px; color:var(--ink-soft); line-height:1.5;}
+  .cs-req b{color:var(--ink);}
+  .cs-req b.cs-diff{display:inline-block; background:#fff0e0; color:var(--orange); border-radius:4px; padding:0 6px; margin-right:4px; font-size:10.5px;}
+  .cs-pills{display:flex; gap:8px; flex-wrap:wrap;}
+  @media (max-width:600px){
+    .cs-row{grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);}
+    .cs-head{display:none;}   /* the inputs carry Baseline / Follow-up placeholders */
+    .cs-lbl, .cs-note{grid-column:1 / -1;}
+  }
   fieldset.ux-entry-fs{background:var(--yellow-bg); border:2px solid #e3c257;}
   fieldset.ux-entry-fs > legend{background:#fbe7a4; border-radius:5px; padding:1px 8px; color:#6b4e00;}
   .ux-entry-info{
@@ -575,11 +614,6 @@
   .empty b{color:var(--ink);}
 
   /* ---------- Favourite star inside each calculator ---------- */
-  .star-pull{
-    margin-top:10px; font:inherit; font-size:12.5px; font-weight:600; color:var(--blue); background:var(--blue-pale);
-    border:1px solid #c6dcf7; border-radius:7px; padding:6px 10px; cursor:pointer; text-align:left;
-  }
-  .star-pull:hover{border-color:var(--blue);}
   .calc-fav{
     display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13px; font-weight:700;
     padding:8px 12px; border-radius:7px; cursor:pointer; white-space:nowrap;
@@ -630,7 +664,7 @@
     <p>Clinical calculators for Rheumatology — disease activity scores &amp; classification criteria</p>
   </div>
   <nav class="top-tabs" id="topTabs" aria-label="主要導覽"></nav>
-  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/09/30 version</div>
+  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/10/06 version</div>
 </header>
 
 <div class="layout">
@@ -669,13 +703,15 @@ const CALCS = [
   {id:'easybilag', name:'Easy-BILAG (SLE)', cat:'activity', short:'Simplified BILAG-2004 disease activity by organ system — includes a BICLA responder sub-tab'},
   {id:'clasi', name:'CLASI', cat:'activity', short:'Cutaneous Lupus Erythematosus Disease Area & Severity Index'},
   {id:'lnpath', name:'Lupus Nephritis AI / CI', cat:'activity', short:'Renal biopsy Activity Index & Chronicity Index (modified NIH, 2018 ISN/RPS revision)'},
+  {id:'sdi', name:'SLICC/ACR Damage Index (SDI)', cat:'activity', short:'Cumulative irreversible organ damage in SLE since diagnosis (0–47)'},
+  {id:'lldas', name:'LLDAS / DORIS remission', cat:'activity', short:'Lupus Low Disease Activity State (Franklyn 2016)'},
+  {id:'doris', name:'LLDAS / DORIS remission', cat:'activity', short:'2021 DORIS definition of remission in SLE'},
   /* --- Sjögren --- */
   {id:'sjogren2016', name:'Sjögren criteria', cat:'criteria', short:"Classification criteria for primary Sjögren's disease"},
   {id:'sjogren2002', name:'Sjögren criteria', cat:'criteria', short:"Revised American-European Consensus Group criteria for Sjögren's syndrome"},
   {id:'essdai', name:'ESSDAI / ClinESSDAI', cat:'activity', short:"EULAR Sjögren's Syndrome Disease Activity Index (systemic, clinician-scored) — includes a ClinESSDAI sub-tab"},
   {id:'esspri', name:'ESSPRI', cat:'activity', short:"EULAR Sjögren's Syndrome Patient Reported Index"},
-  {id:'cress', name:'CRESS / STAR', cat:'activity', short:"Composite of Relevant Endpoints for Sjögren's Syndrome (treatment-response index)"},
-  {id:'star', name:'CRESS / STAR', cat:'activity', short:"Sjögren's Tool for Assessing Response (treatment-response composite)"},
+  {id:'cress', name:'CRESS / STAR', cat:'activity', short:"Sjögren's treatment-response composites — one data entry, both CRESS and STAR scores"},
   /* --- Systemic sclerosis --- */
   {id:'ssc2013', name:'SSc criteria', cat:'criteria', short:'Classification criteria for systemic sclerosis'},
   {id:'mrss', name:'mRSS', cat:'activity', short:'Modified Rodnan Skin Score, for systemic sclerosis'},
@@ -699,6 +735,7 @@ const CALCS = [
   {id:'caspar', name:'Psoriatic arthritis (CASPAR) criteria', cat:'criteria', short:'Classification criteria for psoriatic arthritis'},
   {id:'dapsa', name:'DAPSA', cat:'activity', short:'Disease Activity in Psoriatic Arthritis'},
   {id:'gout2015', name:'Gout criteria', cat:'criteria', short:'Classification criteria for gout'},
+  {id:'rs3pe', name:'RS3PE criteria', cat:'criteria', short:'Remitting seronegative symmetrical synovitis with pitting edema — Olivé 1997 diagnostic criteria'},
   /* --- Vasculitis --- */
   {id:'gpa2022', name:'GPA criteria', cat:'criteria', short:'Classification criteria for granulomatosis with polyangiitis'},
   {id:'mpa2022', name:'MPA criteria', cat:'criteria', short:'Classification criteria for microscopic polyangiitis'},
@@ -737,8 +774,8 @@ const CALC_GROUPS = [
    members:[['iga2010','2010 EULAR/PRINTO/PRES'],['hsp1990','1990 ACR (legacy HSP)']]},
   {id:'g-igg4', name:'IgG4-RD criteria', cat:'criteria', short:'IgG4-related disease — classification & diagnostic criteria (tabs)',
    members:[['igg4rd2019','2019 ACR/EULAR classification'],['igg4rd2020','2020 revised comprehensive diagnostic (RCD)']]},
-  {id:'g-cress', name:'CRESS / STAR', cat:'activity', short:"Sjögren's treatment-response composites — CRESS & STAR (tabs)",
-   members:[['cress','CRESS'],['star','STAR (Sjögren’s Tool for Assessing Response)']]},
+  {id:'g-t2t', name:'LLDAS / DORIS remission', cat:'activity', short:'SLE treat-to-target states — low disease activity (LLDAS) & remission (DORIS 2021) (tabs)',
+   members:[['lldas','LLDAS (low disease activity)'],['doris','DORIS 2021 remission']]},
   {id:'g-aps', name:'APS criteria', cat:'criteria', short:'Antiphospholipid syndrome — 2023 ACR/EULAR & 2006 revised Sapporo (tabs)',
    members:[['aps2023','2023 ACR/EULAR'],['aps2006','2006 revised Sapporo (Sydney)']]},
 ];
@@ -1298,7 +1335,9 @@ panelsRoot.insertAdjacentHTML('beforeend', panelShell('sledai','SLEDAI-2K',
 function slCalc(){
   let total=0;
   SLEDAI_ITEMS.forEach((it,i)=>{ if(document.getElementById('sl-'+i).checked) total+=it[1]; });
-  document.getElementById('sl-score').innerHTML = total+'<small>SLEDAI-2K total</small>';
+  /* clinical SLEDAI (used by DORIS) = SLEDAI-2K without the two serology items: low complement, anti-dsDNA */
+  const sero = SLEDAI_ITEMS.reduce((s,it,i)=>s+(/complement|DNA binding/i.test(it[0]) && document.getElementById('sl-'+i).checked ? it[1] : 0), 0);
+  document.getElementById('sl-score').innerHTML = total+'<small>SLEDAI-2K total · clinical SLEDAI (no serology) '+(total-sero)+'</small>';
   const pill=document.getElementById('sl-pill');
   let level,label;
   if(total===0){level='green';label='No activity';}
@@ -2928,8 +2967,8 @@ const ESSDAI_DOMAINS = [
   ]},
   {id:'bio', name:'Biological', weight:1, levels:[
     [0,'None — absence of the following biological features'],
-    [1,'Low — clonal component, and/or hypocomplementemia (low C3/C4/CH50), and/or hypergammaglobulinemia or IgG 16–20g/L'],
-    [2,'Moderate — cryoglobulinemia, and/or hypergammaglobulinemia or IgG >20g/L, and/or new/recent hypogammaglobulinemia or IgG <5g/L'],
+    [1,'Low — clonal component, and/or hypocomplementemia (low C3/C4/CH50), and/or hypergammaglobulinemia or IgG 1600–2000 mg/dL'],
+    [2,'Moderate — cryoglobulinemia, and/or hypergammaglobulinemia or IgG >2000 mg/dL, and/or new/recent hypogammaglobulinemia or IgG <500 mg/dL'],
   ]},
 ];
 /* ClinESSDAI (Seror R, et al. Ann Rheum Dis 2016) — same domains and activity levels as ESSDAI,
@@ -3386,133 +3425,111 @@ function sj02Calc(){
 sj02SetMode('primary');
 
 /* =========================================================
-   37. CRESS — Composite of Relevant Endpoints for Sjögren's Syndrome
+   37. CRESS / STAR — Sjögren's treatment-response composites, one shared data entry.
+   CRESS (Arends 2021): 5 domains, responder ≥3 of 5.
+   STAR (Seror 2022, Table 3): weights 3/3/1/1/1, responder ≥5 of 9.
+   Domains 2–5 use the same response definitions in both; only systemic activity differs
+   (CRESS: ClinESSDAI <5 at follow-up · STAR: ClinESSDAI decrease ≥3).
 ========================================================= */
-const CRESS_DOMAINS = [
-  {id:'d1', label:'Systemic activity: ClinESSDAI &lt;5 at follow-up'},
-  {id:'d2', label:'Patient-reported symptoms: ESSPRI decrease ≥1 point OR ≥15% from baseline'},
-  {id:'d3', label:'Ocular: Schirmer’s test increase ≥5mm, OR ocular staining score (OSS) decrease ≥2 points (no change required if baseline was normal)'},
-  {id:'d4', label:'Salivary: unstimulated whole salivary flow increase ≥25% (or salivary gland ultrasonography score decrease ≥25%)'},
-  {id:'d5', label:'Serology: rheumatoid factor decrease ≥25% OR IgG decrease ≥10%'},
-];
+const csRow = (id, label, unit, step) => `<div class="cs-row">
+    <div class="cs-lbl">${label}<span class="hint">${unit}</span></div>
+    <input type="number" id="cs-${id}-b" min="0" step="${step}" placeholder="Baseline" aria-label="${label} — baseline" oninput="csCalc()">
+    <span class="cs-arrow" aria-hidden="true">→</span>
+    <input type="number" id="cs-${id}-f" min="0" step="${step}" placeholder="Follow-up" aria-label="${label} — follow-up" oninput="csCalc()">
+    <div class="cs-note" id="cs-${id}-note"></div>
+  </div>`;
+const csDom = (n, title, rows, req) => `<fieldset class="cs-dom">
+    <legend>${n}. ${title}<span class="cs-res" id="cs-r${n}">not assessed</span></legend>
+    <div class="cs-head"><span></span><span>Baseline</span><span></span><span>Follow-up</span></div>
+    ${rows}
+    <div class="cs-req">${req}</div>
+  </fieldset>`;
 panelsRoot.insertAdjacentHTML('beforeend', panelShell('cress','CRESS / STAR',
-  "Composite of Relevant Endpoints for Sjögren's Syndrome — a 5-domain treatment-response index; a patient is a responder if ≥3 of 5 domains are met at follow-up versus baseline.",'activity',
-  `${CRESS_DOMAINS.map(d=>`<div class="check-item"><input type="checkbox" id="cress-${d.id}" data-w="1" onchange="cressCalc()"><label for="cress-${d.id}">${d.label}</label></div>`).join('')}`,
-  `<div><div class="score" id="cress-score">0<small>Domains met (of 5)</small></div></div><span class="pill neutral" id="cress-pill">Enter values</span>`,
-  'Responder = ≥3 of 5 domains met. In the derivation cohort, abatacept showed a 65% CRESS response rate vs 18% with placebo (p&lt;0.001).',
-  "Arends S, de Wolff L, van Nimwegen JF, Verstappen GM, Vehof J, et al. Composite of Relevant Endpoints for Sjögren's Syndrome (CRESS): development and validation of a novel outcome measure. <i>Lancet Rheumatol.</i> 2021;3(8):e553–e562."
+  "Two Sjögren's treatment-response composites built on the same five domains. Enter baseline and follow-up values once — both the CRESS and the STAR result are calculated. Domains left blank count as not met.",'activity',
+  csDom(1, 'Systemic activity — ClinESSDAI', csRow('clin','ClinESSDAI','0–135','1'),
+     '<b class="cs-diff">Differs</b> <b>CRESS:</b> ClinESSDAI &lt;5 at follow-up (baseline not needed) · <b>STAR (3 pts):</b> decrease ≥3 from baseline')
+  + csDom(2, 'Patient-reported symptoms — ESSPRI', csRow('esspri','ESSPRI','0–10','0.1'),
+     '<b>CRESS &amp; STAR (3 pts):</b> decrease ≥1 point or ≥15% from baseline')
+  + csDom(3, 'Tear gland — Schirmer or OSS', csRow('sch','Schirmer’s test','mm/5 min, no anaesthesia','0.5') + csRow('oss','Ocular staining score','0–12','0.5'),
+     '<b>CRESS &amp; STAR (1 pt), either test:</b> abnormal at baseline → Schirmer increase ≥5 mm / OSS decrease ≥2 points; normal at baseline → no change to abnormal. Abnormal = Schirmer &lt;5 mm, OSS ≥3; mean of both eyes.')
+  + csDom(4, 'Salivary gland — UWSF or ultrasound', csRow('uws','Unstimulated whole salivary flow','mL/min','0.01') + csRow('us','Salivary gland ultrasound','total Hocevar score (optional)','1'),
+     '<b>CRESS &amp; STAR (1 pt), either test:</b> UWSF increase ≥25% (if 0 at baseline: any increase); ultrasound score decrease ≥25%. Use the same collection protocol (5 or 15 min, morning, fasting 60 min) at both visits.')
+  + csDom(5, 'Serology — IgG or RF', csRow('igg','Serum IgG','mg/dL (g/L × 100)','1') + csRow('rf','Rheumatoid factor','IU/mL','1'),
+     '<b>CRESS &amp; STAR (1 pt), either test:</b> IgG decrease ≥10% or RF decrease ≥25%'),
+  `<div style="display:flex; gap:28px; flex-wrap:wrap;">
+     <div><div class="score" id="cs-cress">0<small>CRESS — domains met (of 5)</small></div></div>
+     <div><div class="score" id="cs-star">0<small>STAR — points (of 9)</small></div></div>
+   </div>
+   <div class="cs-pills"><span class="pill neutral" id="cs-cress-pill">CRESS: enter values</span><span class="pill neutral" id="cs-star-pill">STAR: enter values</span></div>`,
+  '<b>CRESS responder</b> = ≥3 of 5 domains met (each domain counts 1). <b>STAR responder</b> = ≥5 of 9 points (systemic 3, symptoms 3, tear gland 1, salivary gland 1, serology 1) — so STAR always needs improvement in ClinESSDAI or ESSPRI. The only domain whose definition differs is systemic activity. Both were developed as group-level efficacy endpoints for clinical trials (STAR: “candidate STAR”).',
+  "Arends S, de Wolff L, van Nimwegen JF, et al. Composite of Relevant Endpoints for Sjögren's Syndrome (CRESS): development and validation of a novel outcome measure. <i>Lancet Rheumatol.</i> 2021;3(8):e553–e562. Seror R, Baron G, Camus M, et al. Development and preliminary validation of the Sjögren's Tool for Assessing Response (STAR). <i>Ann Rheum Dis.</i> 2022;81(7):979–989 (Table 3)."
 ));
-function cressCalc(){
-  const total = sumChecks(CRESS_DOMAINS.map(d=>'cress-'+d.id));
-  document.getElementById('cress-score').innerHTML = total+'<small>Domains met (of 5)</small>';
-  const pill = document.getElementById('cress-pill');
-  pill.className = total>=3 ? 'pill green' : 'pill neutral';
-  pill.textContent = total>=3 ? 'CRESS responder ('+total+'/5 domains met)' : 'Not a CRESS responder ('+total+'/5 domains met)';
-}
-cressCalc();
+function csNum(id){ const el = document.getElementById(id); return (el && el.value!=='' && isFinite(+el.value)) ? +el.value : null; }
+function csCalc(){
+  const $ = id => document.getElementById(id);
+  const pct = (b,f) => roundTo((f-b)/b*100, 1);                          /* % change from baseline */
+  const delta = (b,f) => { const d = roundTo(f-b,2); return 'Δ '+(d>0?'+':'')+d+(b>0 ? ' ('+(pct(b,f)>0?'+':'')+pct(b,f)+'%)' : ''); };
+  const note = (id, txt, ok) => { const el = $('cs-'+id+'-note'); el.textContent = txt ? txt+(ok===true?' ✓':ok===false?' ✗':'') : ''; el.className = 'cs-note'+(ok===true?' ok':ok===false?' no':''); };
+  const pair = id => [csNum('cs-'+id+'-b'), csNum('cs-'+id+'-f')];
+  const both = (b,f) => b!==null && f!==null;
 
-/* =========================================================
-   37b. STAR — Sjögren's Tool for Assessing Response
-   (Seror R, et al. Ann Rheum Dis 2022; NECESSITY consortium)
-   5 weighted domains, baseline vs follow-up; responder = STAR ≥5 of 9.
-========================================================= */
-const starPair = (id, label, unit, step) => `
-  <div class="field"><label>${label} — baseline <span class="hint">${unit}</span></label><input type="number" id="star-${id}-b" min="0" step="${step}" placeholder="baseline" oninput="starCalc()"></div>
-  <div class="field"><label>${label} — follow-up <span class="hint">${unit}</span></label><input type="number" id="star-${id}-f" min="0" step="${step}" placeholder="follow-up" oninput="starCalc()"></div>`;
-panelsRoot.insertAdjacentHTML('beforeend', panelShell('star','CRESS / STAR',
-  "Sjögren's Tool for Assessing Response — a weighted 5-domain composite comparing a follow-up visit with baseline (developed by the NECESSITY consortium as a trial endpoint). Enter baseline and follow-up values; domains left blank score 0 (not assessed).",'activity',
-  `<fieldset style="margin-top:14px;"><legend>1. Systemic activity — ClinESSDAI decrease ≥3 <span class="dom-badge zero" id="star-b1">0</span></legend>
-     <div class="grid">${starPair('clin','ClinESSDAI','0–135','1')}</div>
-     <button type="button" class="star-pull" onclick="starPull('clin')">↳ Use the current ClinESSDAI from the ESSDAI / ClinESSDAI page as follow-up</button>
-   </fieldset>
-   <fieldset style="margin-top:12px;"><legend>2. Patient symptoms — ESSPRI decrease ≥1 point or ≥15% <span class="dom-badge zero" id="star-b2">0</span></legend>
-     <div class="grid">${starPair('esspri','ESSPRI','0–10','0.1')}</div>
-     <button type="button" class="star-pull" onclick="starPull('esspri')">↳ Use the current ESSPRI from the ESSPRI page as follow-up</button>
-   </fieldset>
-   <fieldset style="margin-top:12px;"><legend>3. Lachrymal gland function — Schirmer OR ocular staining score <span class="dom-badge zero" id="star-b3">0</span></legend>
-     <div class="hint" style="margin-top:8px;">Mean of both eyes. Schirmer’s test without anaesthesia, abnormal if &lt;5 mm; ocular staining score abnormal if ≥3. Baseline status is determined automatically from these cut-offs.</div>
-     <div class="grid">${starPair('sch','Schirmer’s test','mm/5 min','0.5')}</div>
-     <div class="hint" id="star-sch-rule" style="margin-top:6px;"></div>
-     <div class="grid">${starPair('oss','Ocular staining score','0–12','0.5')}</div>
-     <div class="hint" id="star-oss-rule" style="margin-top:6px;"></div>
-   </fieldset>
-   <fieldset style="margin-top:12px;"><legend>4. Salivary gland function — unstimulated salivary flow OR ultrasound <span class="dom-badge zero" id="star-b4">0</span></legend>
-     <div class="grid">${starPair('uws','Unstimulated whole salivary flow','mL/min','0.01')}</div>
-     <div class="grid">${starPair('us','Salivary gland ultrasound (optional)','total Hocevar score','1')}</div>
-     <div class="hint" style="margin-top:6px;">UWSF: use one collection protocol (5 or 15 min) consistently at both visits — morning, fixed time, no eating/drinking/smoking for 60 min and no morning secretagogue dose before collection.</div>
-   </fieldset>
-   <fieldset style="margin-top:12px;"><legend>5. Biological — serum IgG decrease ≥10% OR RF decrease ≥25% <span class="dom-badge zero" id="star-b5">0</span></legend>
-     <div class="grid">${starPair('igg','Serum IgG','g/L','0.1')}</div>
-     <div class="grid">${starPair('rf','Rheumatoid factor','IU/mL','1')}</div>
-   </fieldset>`,
-  `<div><div class="score" id="star-score">0<small>STAR (0–9)</small></div></div><span class="pill neutral" id="star-pill">Enter values</span>`,
-  '<b>Scoring</b> — Systemic activity: ClinESSDAI decrease ≥3 → 3 points. Patient symptoms: ESSPRI decrease ≥1 point or ≥15% → 3 points. Lachrymal gland function (1 point): Schirmer’s test — if abnormal at baseline, increase ≥5 mm; if normal at baseline, no change to abnormal — OR ocular staining score — if abnormal at baseline, decrease ≥2 points; if normal at baseline, no change to abnormal. Salivary gland function (1 point): unstimulated whole salivary flow — if &gt;0 at baseline, increase ≥25%; if 0 at baseline, any increase from 0 — OR ultrasound: decrease ≥25% in total Hocevar score. Biological (1 point): serum IgG decrease ≥10% OR rheumatoid factor (total or IgM, IU/mL) decrease ≥25%. <b>Candidate STAR responder = total ≥5 of 9</b> — so at least one of the two major domains (systemic activity or patient-reported outcome) must improve. Ocular tests: Schirmer’s test without anaesthesia, abnormal if &lt;5 mm; ocular staining score abnormal if ≥3; mean of both eyes. Transcribed from Table 3 of Seror et al. 2022. STAR was developed as an efficacy endpoint for clinical trials.',
-  "Seror R, Baron G, Camus M, et al. Development and preliminary validation of the Sjögren's Tool for Assessing Response (STAR): a consensual composite score for assessing treatment effect in primary Sjögren's syndrome. <i>Ann Rheum Dis.</i> 2022;81(7):979–989."
-));
-function starNum(id){ const el = document.getElementById(id); return (el && el.value!=='' && isFinite(+el.value)) ? +el.value : null; }
-function starPull(which){
-  const el = document.getElementById(which==='clin' ? 'star-clin-f' : 'star-esspri-f');
-  if(which==='clin') el.value = essdaiScores().clin;
-  else el.value = roundTo((+document.getElementById('esspri-dry').value + +document.getElementById('esspri-fat').value + +document.getElementById('esspri-pain').value)/3, 1);
-  el.dispatchEvent(new Event('input',{bubbles:true}));
-}
-function starCalc(){
-  const pct = (b,f) => roundTo((f-b)/b*100, 1);          /* % change from baseline (negative = decrease) */
-  const d = [];
-  /* 1. ClinESSDAI */
-  { const b = starNum('star-clin-b'), f = starNum('star-clin-f');
-    d.push({n:'Systemic (ClinESSDAI)', w:3, set:b!==null&&f!==null, met: b!==null&&f!==null && roundTo(b-f,2)>=3}); }
+  /* 1. Systemic — the one domain whose definition differs */
+  const [cb, cf] = pair('clin');
+  const cressSys = {set: cf!==null, met: cf!==null && cf<5};
+  const starSys  = {set: both(cb,cf), met: both(cb,cf) && roundTo(cb-cf,2)>=3};
+  note('clin', cf===null ? '' : 'CRESS: follow-up '+cf+(cf<5?' <5 ✓':' ≥5 ✗')+' · STAR: '+(cb===null ? 'needs baseline' : delta(cb,cf)+(starSys.met?' ✓':' ✗')), null);
+
   /* 2. ESSPRI */
-  { const b = starNum('star-esspri-b'), f = starNum('star-esspri-f'), set = b!==null&&f!==null;
-    d.push({n:'Symptoms (ESSPRI)', w:3, set, met: set && (roundTo(b-f,2)>=1 || (b>0 && pct(b,f)<=-15))}); }
-  /* 3. Lachrymal: Schirmer OR OSS */
-  /* Table 3 footnote: Schirmer (no anaesthesia) abnormal if <5 mm; OSS abnormal if ≥3; mean of both eyes */
-  { let set=false, met=false;
-    const schRule = document.getElementById('star-sch-rule'), ossRule = document.getElementById('star-oss-rule');
-    schRule.textContent = ''; ossRule.textContent = '';
-    const sb=starNum('star-sch-b'), sf=starNum('star-sch-f');
-    if(sb!==null&&sf!==null){
-      set=true;
-      const ok = sb<5 ? roundTo(sf-sb,2)>=5 : sf>=5;
-      if(ok) met=true;
-      schRule.textContent = (sb<5 ? 'Abnormal at baseline (<5 mm) → needs increase ≥5 mm' : 'Normal at baseline (≥5 mm) → needs no change to abnormal (<5 mm)')+' — '+(ok?'✓ met':'✗ not met');
-    }
-    const ob=starNum('star-oss-b'), of=starNum('star-oss-f');
-    if(ob!==null&&of!==null){
-      set=true;
-      const ok = ob>=3 ? roundTo(ob-of,2)>=2 : of<3;
-      if(ok) met=true;
-      ossRule.textContent = (ob>=3 ? 'Abnormal at baseline (≥3) → needs decrease ≥2 points' : 'Normal at baseline (<3) → needs no change to abnormal (≥3)')+' — '+(ok?'✓ met':'✗ not met');
-    }
-    d.push({n:'Lachrymal', w:1, set, met}); }
-  /* 4. Salivary: UWS OR ultrasound */
-  { let set=false, met=false;
-    const b=starNum('star-uws-b'), f=starNum('star-uws-f');
-    if(b!==null&&f!==null){ set=true; if(b>0 ? pct(b,f)>=25 : f>0) met=true; }
-    const ub=starNum('star-us-b'), uf=starNum('star-us-f');
-    if(ub!==null&&uf!==null&&ub>0){ set=true; if(pct(ub,uf)<=-25) met=true; }
-    d.push({n:'Salivary', w:1, set, met}); }
-  /* 5. Biological: IgG OR RF */
-  { let set=false, met=false;
-    const gb=starNum('star-igg-b'), gf=starNum('star-igg-f');
-    if(gb!==null&&gf!==null&&gb>0){ set=true; if(pct(gb,gf)<=-10) met=true; }
-    const rb=starNum('star-rf-b'), rf=starNum('star-rf-f');
-    if(rb!==null&&rf!==null&&rb>0){ set=true; if(pct(rb,rf)<=-25) met=true; }
-    d.push({n:'Biological', w:1, set, met}); }
-  let total = 0;
-  d.forEach((x,i)=>{
-    const pts = x.met ? x.w : 0; total += pts;
-    const b = document.getElementById('star-b'+(i+1));
-    b.textContent = x.met ? '+'+x.w+' pts ✓' : (x.set ? '0 pts' : 'not assessed');
-    b.classList.toggle('zero', !x.met);
-  });
-  document.getElementById('star-score').innerHTML = total+'<small>STAR (0–9) · '+d.map(x=>(x.met?'✓ ':(x.set?'✗ ':'– '))+x.n).join(' · ')+'</small>';
-  const pill = document.getElementById('star-pill');
-  if(!d.some(x=>x.set)){ pill.className='pill neutral'; pill.textContent='Enter baseline and follow-up values'; return; }
-  pill.className = total>=5 ? 'pill green' : 'pill neutral';
-  pill.textContent = total>=5 ? 'STAR responder ('+total+'/9, ≥5)' : 'Not a STAR responder ('+total+'/9, need ≥5)';
+  const [eb, ef] = pair('esspri');
+  const sym = {set: both(eb,ef), met: both(eb,ef) && (roundTo(eb-ef,2)>=1 || (eb>0 && pct(eb,ef)<=-15))};
+  note('esspri', sym.set ? delta(eb,ef) : '', sym.set ? sym.met : null);
+
+  /* 3. Tear gland — Schirmer abnormal <5 mm, OSS abnormal ≥3 (mean of both eyes) */
+  const tear = {set:false, met:false};
+  { const [b,f] = pair('sch');
+    if(both(b,f)){ const ok = b<5 ? roundTo(f-b,2)>=5 : f>=5; tear.set = true; tear.met = tear.met || ok;
+      note('sch', (b<5 ? 'abnormal at baseline → needs ↑≥5 mm' : 'normal at baseline → must stay ≥5 mm')+' · '+delta(b,f), ok); } else note('sch','',null); }
+  { const [b,f] = pair('oss');
+    if(both(b,f)){ const ok = b>=3 ? roundTo(b-f,2)>=2 : f<3; tear.set = true; tear.met = tear.met || ok;
+      note('oss', (b>=3 ? 'abnormal at baseline → needs ↓≥2' : 'normal at baseline → must stay <3')+' · '+delta(b,f), ok); } else note('oss','',null); }
+
+  /* 4. Salivary gland — UWSF or ultrasound */
+  const sal = {set:false, met:false};
+  { const [b,f] = pair('uws');
+    if(both(b,f)){ const ok = b>0 ? pct(b,f)>=25 : f>0; sal.set = true; sal.met = sal.met || ok;
+      note('uws', (b>0 ? 'needs ↑≥25%' : '0 at baseline → any increase')+' · '+delta(b,f), ok); } else note('uws','',null); }
+  { const [b,f] = pair('us');
+    if(both(b,f) && b>0){ const ok = pct(b,f)<=-25; sal.set = true; sal.met = sal.met || ok;
+      note('us', 'needs ↓≥25% · '+delta(b,f), ok); } else note('us','',null); }
+
+  /* 5. Serology — IgG or RF */
+  const ser = {set:false, met:false};
+  { const [b,f] = pair('igg');
+    if(both(b,f) && b>0){ const ok = pct(b,f)<=-10; ser.set = true; ser.met = ser.met || ok; note('igg','needs ↓≥10% · '+delta(b,f), ok); } else note('igg','',null); }
+  { const [b,f] = pair('rf');
+    if(both(b,f) && b>0){ const ok = pct(b,f)<=-25; ser.set = true; ser.met = ser.met || ok; note('rf','needs ↓≥25% · '+delta(b,f), ok); } else note('rf','',null); }
+
+  /* Totals */
+  const shared = [sym, tear, sal, ser], W = [3,1,1,1];
+  const cressDomains = [cressSys, ...shared];
+  const cress = cressDomains.filter(x=>x.met).length;
+  const star = (starSys.met?3:0) + shared.reduce((s,x,i)=>s+(x.met?W[i]:0), 0);
+
+  /* Per-domain result chip in each legend */
+  const chip = (n, txt, on) => { const el = $('cs-r'+n); el.textContent = txt; el.classList.toggle('on', on); };
+  chip(1, (cressSys.set||starSys.set) ? 'CRESS '+(cressSys.set?(cressSys.met?'✓':'✗'):'–')+' · STAR '+(starSys.set?(starSys.met?'+3':'0'):'–') : 'not assessed', cressSys.met||starSys.met);
+  shared.forEach((x,i)=> chip(i+2, x.set ? (x.met ? '✓ met · CRESS +1 · STAR +'+W[i] : '✗ not met') : 'not assessed', x.met));
+
+  $('cs-cress').innerHTML = cress+'<small>CRESS — domains met (of 5)</small>';
+  $('cs-star').innerHTML  = star+'<small>STAR — points (of 9)</small>';
+  const anySet = cressDomains.some(x=>x.set) || starSys.set;
+  const cp = $('cs-cress-pill'), sp = $('cs-star-pill');
+  if(!anySet){ cp.className = sp.className = 'pill neutral'; cp.textContent = 'CRESS: enter values'; sp.textContent = 'STAR: enter values'; return; }
+  cp.className = 'pill '+(cress>=3?'green':'neutral'); cp.textContent = cress>=3 ? 'CRESS responder ('+cress+'/5)' : 'Not a CRESS responder ('+cress+'/5, need ≥3)';
+  sp.className = 'pill '+(star>=5?'green':'neutral');  sp.textContent = star>=5 ? 'STAR responder ('+star+'/9)' : 'Not a STAR responder ('+star+'/9, need ≥5)';
 }
-starCalc();
+csCalc();
+
 
 /* =========================================================
    38. Inflammatory Back Pain Criteria (Calin / Berlin / ASAS)
@@ -4333,6 +4350,201 @@ function mctdCalc(){
 mctdSetMode('as');
 
 /* =========================================================
+   52. SLICC/ACR Damage Index (SDI) — Gladman 1996
+   41 items, 12 organ systems, 0–47. Damage = irreversible change, not related to active
+   inflammation, occurring since SLE diagnosis, present ≥6 months unless stated otherwise.
+========================================================= */
+const sdiChk = (id, label, w=1) => `<div class="check-item"><input type="checkbox" id="sdi-${id}" data-w="${w}" onchange="sdiCalc()"><label for="sdi-${id}">${label} <span class="w">(${w} pt${w>1?'s':''})</span></label></div>`;
+const sdiRep = (id, label, unit) => `<div class="field full"><label>${label}</label>
+    <select id="sdi-${id}" onchange="sdiCalc()"><option value="0">Absent (0)</option><option value="1">One ${unit} (1)</option><option value="2">More than one ${unit}, ≥6 months apart (2)</option></select></div>`;
+const sdiDom = (title, body) => `<fieldset class="big-dom"><legend>${title}</legend>${body}</fieldset>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('sdi','SLICC/ACR Damage Index (SDI)',
+  'Records irreversible organ damage in SLE regardless of cause (lupus, treatment or comorbidity). Score an item only if it is not due to active inflammation, has occurred since the diagnosis of SLE and has been present for ≥6 months (unless stated otherwise). The same lesion cannot be scored twice; the score can only stay the same or rise over time.','activity',
+  sdiDom('Ocular (either eye, by clinical assessment)', sdiChk('cataract','Any cataract ever') + sdiChk('retina','Retinal change or optic atrophy'))
+  + sdiDom('Neuropsychiatric',
+      sdiChk('cog','Cognitive impairment (e.g. memory deficit, difficulty with calculation, poor concentration, difficulty with spoken or written language, impaired performance level) or major psychosis')
+      + sdiChk('seizure','Seizures requiring therapy for 6 months')
+      + sdiRep('cva','Cerebrovascular accident ever','episode')
+      + sdiChk('neuropathy','Cranial or peripheral neuropathy (excluding optic)')
+      + sdiChk('myelitis','Transverse myelitis'))
+  + sdiDom('Renal', `<div class="field full"><label>Renal damage</label>
+      <select id="sdi-renal" onchange="sdiCalc()">
+        <option value="0">Absent (0)</option>
+        <option value="1">Estimated or measured GFR &lt;50% (1)</option>
+        <option value="1">Proteinuria ≥3.5 g/24 h (1)</option>
+        <option value="2">Both GFR &lt;50% and proteinuria ≥3.5 g/24 h (2)</option>
+        <option value="3">End-stage renal disease, regardless of dialysis or transplantation (3)</option>
+      </select></div>`)
+  + sdiDom('Pulmonary',
+      sdiChk('pah','Pulmonary hypertension (right ventricular prominence or loud P2)')
+      + sdiChk('pfib','Pulmonary fibrosis (physical examination and radiograph)')
+      + sdiChk('shrink','Shrinking lung (radiograph)')
+      + sdiChk('pleural','Pleural fibrosis (radiograph)')
+      + sdiChk('pinf','Pulmonary infarction (radiograph)'))
+  + sdiDom('Cardiovascular',
+      sdiChk('angina','Angina or coronary artery bypass')
+      + sdiRep('mi','Myocardial infarction ever','episode')
+      + sdiChk('cmp','Cardiomyopathy (ventricular dysfunction)')
+      + sdiChk('valve','Valvular disease (diastolic murmur, or systolic murmur &gt;3/6)')
+      + sdiChk('peric','Pericarditis for 6 months, or pericardiectomy'))
+  + sdiDom('Peripheral vascular',
+      sdiChk('claud','Claudication for 6 months')
+      + sdiChk('minor','Minor tissue loss (pulp space)')
+      + sdiRep('tissue','Significant tissue loss ever (e.g. loss of digit or limb)','site')
+      + sdiChk('venous','Venous thrombosis with swelling, ulceration or venous stasis'))
+  + sdiDom('Gastrointestinal',
+      sdiRep('bowel','Infarction or resection of bowel below duodenum, spleen, liver or gall bladder ever, for any cause','site')
+      + sdiChk('mesent','Mesenteric insufficiency')
+      + sdiChk('periton','Chronic peritonitis')
+      + sdiChk('stricture','Stricture or upper gastrointestinal tract surgery ever')
+      + sdiChk('pancreas','Pancreatic insufficiency requiring enzyme replacement or with pseudocyst'))
+  + sdiDom('Musculoskeletal',
+      sdiChk('atrophy','Muscle atrophy or weakness')
+      + sdiChk('arthritis','Deforming or erosive arthritis (including reducible deformities, excluding avascular necrosis)')
+      + sdiChk('osteo','Osteoporosis with fracture or vertebral collapse (excluding avascular necrosis)')
+      + sdiRep('avn','Avascular necrosis','site')
+      + sdiChk('osteomyel','Osteomyelitis')
+      + sdiChk('tendon','Tendon rupture'))
+  + sdiDom('Skin',
+      sdiChk('alopecia','Scarring chronic alopecia')
+      + sdiChk('scar','Extensive scarring or panniculum other than scalp and pulp space')
+      + sdiChk('ulcer','Skin ulceration (excluding thrombosis) for more than 6 months'))
+  + sdiDom('Endocrine, gonadal &amp; malignancy',
+      sdiChk('gonad','Premature gonadal failure')
+      + sdiChk('dm','Diabetes (regardless of treatment)')
+      + sdiRep('malig','Malignancy (excluding dysplasia)','site')),
+  `<div><div class="score" id="sdi-score">0<small>SDI total (0–47)</small></div></div><span class="pill green" id="sdi-pill">No damage recorded (SDI 0)</span>`,
+  'Domain ranges: ocular 0–2, neuropsychiatric 0–6, renal 0–3, pulmonary 0–5, cardiovascular 0–6, peripheral vascular 0–5, gastrointestinal 0–6, musculoskeletal 0–7, skin 0–3, premature gonadal failure 0–1, diabetes 0–1, malignancy 0–2 (maximum 47). Items marked “more than one” score 2 only for repeat episodes/sites occurring ≥6 months apart; myocardial infarction and stroke are scored once they occur. Any SDI ≥1 indicates damage — there are no validated severity bands, so the score is reported as a continuous value.',
+  'Gladman D, Ginzler E, Goldsmith C, et al. The development and initial validation of the Systemic Lupus International Collaborating Clinics/American College of Rheumatology damage index for systemic lupus erythematosus. <i>Arthritis Rheum.</i> 1996;39(3):363–369. Gladman DD, Urowitz MB, Goldsmith CH, et al. The reliability of the SLICC/ACR Damage Index in patients with SLE. <i>Arthritis Rheum.</i> 1997;40(5):809–813.'
+));
+function sdiCalc(){
+  const p = document.getElementById('panel-sdi');
+  let total = 0;
+  p.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb.checked) total += +cb.dataset.w||0; });
+  p.querySelectorAll('select').forEach(s=>{ total += +s.value||0; });
+  document.getElementById('sdi-score').innerHTML = total+'<small>SDI total (0–47)</small>';
+  const pill = document.getElementById('sdi-pill');
+  if(total===0){ pill.className='pill green'; pill.textContent='No damage recorded (SDI 0)'; }
+  else { pill.className='pill '+(total>=3?'red':'orange'); pill.textContent='Organ damage present (SDI '+total+')'; }
+}
+sdiCalc();
+
+/* =========================================================
+   53. LLDAS — Lupus Low Disease Activity State (Franklyn 2016)
+   54. 2021 DORIS remission (van Vollenhoven, Lupus Sci Med 2021)
+   Each criterion is shown with ✓ / ✗; all must be met.
+========================================================= */
+const t2tNum = (id, label, hint, step, max) => `<div class="field"><label>${label} <span class="hint">${hint}</span></label><input type="number" id="${id}" min="0"${max!==undefined?` max="${max}"`:''} step="${step}" placeholder="enter value" oninput="${id.split('-')[0]}Calc()"></div>`;
+const t2tChk = (id, label) => `<div class="check-item"><input type="checkbox" id="${id}" onchange="${id.split('-')[0]}Calc()"><label for="${id}">${label}</label></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('lldas','LLDAS / DORIS remission',
+  'Lupus Low Disease Activity State — all five criteria must be met at the same visit.','activity',
+  `<fieldset class="big-dom"><legend>Disease activity</legend>
+     <div class="grid">${t2tNum('lldas-sledai','SLEDAI-2K','(must be ≤4)','1',105)}${t2tNum('lldas-pga','Physician Global Assessment','(SELENA-SLEDAI PGA, 0–3; must be ≤1)','0.1',3)}</div>
+     <div style="margin-top:10px;">
+       ${t2tChk('lldas-major','No activity in major organ systems — renal, CNS, cardiopulmonary, vasculitis, fever')}
+       ${t2tChk('lldas-hemgi','No haemolytic anaemia and no gastrointestinal activity')}
+       ${t2tChk('lldas-new','No new features of lupus disease activity compared with the previous assessment')}
+     </div>
+   </fieldset>
+   <fieldset class="big-dom"><legend>Treatment</legend>
+     <div class="grid">${t2tNum('lldas-pred','Prednisolone (or equivalent)','mg/day (must be ≤7.5)','0.5')}</div>
+     <div style="margin-top:10px;">${t2tChk('lldas-tx','Immunosuppressive drugs and approved biologics only at well-tolerated standard maintenance doses — no investigational drugs (also tick if none are used)')}</div>
+   </fieldset>`,
+  `<div><div class="score" id="lldas-score">–<small>LLDAS criteria met (of 5)</small></div></div><span class="pill neutral" id="lldas-pill">Enter values</span>`,
+  'LLDAS = all of: (1) SLEDAI-2K ≤4, with no activity in major organ systems (renal, CNS, cardiopulmonary, vasculitis, fever) and no haemolytic anaemia or gastrointestinal activity; (2) no new features of lupus disease activity compared with the previous assessment; (3) SELENA-SLEDAI physician global assessment (0–3) ≤1; (4) current prednisolone (or equivalent) dose ≤7.5 mg/day; (5) well-tolerated standard maintenance doses of immunosuppressive drugs and approved biological agents, excluding investigational drugs. Time spent in LLDAS (e.g. ≥50% of observed time) is associated with less damage accrual and flares.',
+  'Franklyn K, Lau CS, Navarra SV, et al. Definition and initial validation of a Lupus Low Disease Activity State (LLDAS). <i>Ann Rheum Dis.</i> 2016;75(9):1615–1621.'
+));
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('doris','LLDAS / DORIS remission',
+  '2021 DORIS definition of remission in SLE — clinical SLEDAI 0, physician global assessment &lt;0.5, irrespective of serology, on no more than low-dose glucocorticoids.','activity',
+  `<fieldset class="big-dom"><legend>Disease activity</legend>
+     <div class="grid">${t2tNum('doris-csledai','Clinical SLEDAI','(SLEDAI-2K without low complement &amp; anti-dsDNA; must be 0)','1',101)}${t2tNum('doris-pga','Physician Global Assessment','(0–3; must be &lt;0.5)','0.1',3)}</div>
+     <div class="hint" style="margin-top:8px;">Serology is ignored — positive anti-dsDNA or low complement does not exclude remission. The SLEDAI-2K page shows the clinical SLEDAI next to the total.</div>
+   </fieldset>
+   <fieldset class="big-dom"><legend>Treatment</legend>
+     <div class="grid">${t2tNum('doris-pred','Prednisolone (or equivalent)','mg/day (must be ≤5)','0.5')}</div>
+     <div style="margin-top:10px;">${t2tChk('doris-tx','Other treatment limited to antimalarials and/or stable immunosuppressives, including biologics (also tick if none are used)')}</div>
+   </fieldset>`,
+  `<div><div class="score" id="doris-score">–<small>DORIS criteria met (of 4)</small></div></div><span class="pill neutral" id="doris-pill">Enter values</span>`,
+  'DORIS 2021 remission = clinical SLEDAI 0 and physician global assessment &lt;0.5 (0–3), irrespective of serology; the patient may be on antimalarials, low-dose glucocorticoids and/or stable immunosuppressives including biologics. Glucocorticoid threshold: the abstract states “prednisolone 5 mg/day or less”, whereas Box 1 and the final recommendation are worded “&lt;5 mg/day” — this calculator uses ≤5 mg/day. Remission off treatment was judged too rare to be a practical target. The task force recommends using DORIS remission and LLDAS together.',
+  'van Vollenhoven RF, Bertsias G, Doria A, et al. 2021 DORIS definition of remission in SLE: final recommendations from an international task force. <i>Lupus Sci Med.</i> 2021;8(1):e000538.'
+));
+function t2tRender(prefix, crit){
+  const done = crit.filter(c=>c.ok!==null).length, met = crit.filter(c=>c.ok===true).length;
+  const all = crit.length;
+  document.getElementById(prefix+'-score').innerHTML = (done ? met : '–')+'<small>'+(prefix==='lldas'?'LLDAS':'DORIS')+' criteria met (of '+all+') · '+crit.map(c=>(c.ok===true?'✓ ':c.ok===false?'✗ ':'– ')+c.n).join(' · ')+'</small>';
+  const pill = document.getElementById(prefix+'-pill');
+  const label = prefix==='lldas' ? 'LLDAS' : 'DORIS remission';
+  if(crit.some(c=>c.ok===false)){ pill.className='pill neutral'; pill.textContent='Not in '+label+' — '+crit.filter(c=>c.ok===false).map(c=>c.n).join(', ')+' not met'; }
+  else if(done<all){ pill.className='pill neutral'; pill.textContent='Enter values ('+done+'/'+all+' criteria assessed)'; }
+  else { pill.className='pill green'; pill.textContent='Meets '+label+' (all '+all+' criteria)'; }
+}
+function lldasCalc(){
+  const n = id => { const v = document.getElementById(id).value; return v==='' ? null : +v; };
+  const on = id => document.getElementById(id).checked;
+  const s = n('lldas-sledai'), g = n('lldas-pga'), p = n('lldas-pred');
+  const allNum = s!==null && g!==null && p!==null;          /* an unticked box only counts as "not met" once every number is in */
+  const box = id => on(id) ? true : (allNum ? false : null);
+  t2tRender('lldas', [
+    {n:'SLEDAI-2K ≤4, no major-organ / haemolytic / GI activity', ok: s===null ? null : (s>4 ? false : (on('lldas-major') && on('lldas-hemgi') ? true : (allNum ? false : null)))},
+    {n:'no new activity', ok: box('lldas-new')},
+    {n:'PGA ≤1', ok: g===null ? null : g<=1},
+    {n:'prednisolone ≤7.5 mg/day', ok: p===null ? null : p<=7.5},
+    {n:'standard maintenance therapy', ok: box('lldas-tx')},
+  ]);
+}
+function dorisCalc(){
+  const n = id => { const v = document.getElementById(id).value; return v==='' ? null : +v; };
+  const c = n('doris-csledai'), g = n('doris-pga'), p = n('doris-pred');
+  const allNum = c!==null && g!==null && p!==null;
+  t2tRender('doris', [
+    {n:'clinical SLEDAI = 0', ok: c===null ? null : c===0},
+    {n:'PGA <0.5', ok: g===null ? null : g<0.5},
+    {n:'prednisolone ≤5 mg/day', ok: p===null ? null : p<=5},
+    {n:'allowed therapy only', ok: document.getElementById('doris-tx').checked ? true : (allNum ? false : null)},
+  ]);
+}
+lldasCalc(); dorisCalc();
+
+/* =========================================================
+   55. RS3PE — diagnostic criteria (Olivé et al., J Rheumatol 1997)
+   All 4 required. Supportive features are shown but do not change the result.
+========================================================= */
+const RS3PE_CRIT = [
+  ['rs-edema', 'Bilateral pitting oedema of both hands (dorsum)', 'bilateral hand pitting oedema'],
+  ['rs-onset', 'Sudden (acute) onset of polyarthritis',           'sudden-onset polyarthritis'],
+  ['rs-age',   'Age &gt;50 years at onset',                       'age >50'],
+  ['rs-rf',    'Seronegative for rheumatoid factor',             'RF negative'],
+];
+const RS3PE_SUPPORT = [
+  ['rs-gc',   'Dramatic, rapid response to low-dose glucocorticoids'],
+  ['rs-ero',  'No radiographic erosions'],
+  ['rs-symm', 'Symmetrical synovitis / tenosynovitis of the hands and wrists (flexor tendon sheaths), ± pitting oedema of the feet'],
+];
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('rs3pe','RS3PE criteria',
+  'Remitting seronegative symmetrical synovitis with pitting oedema — an acute, symmetrical, seronegative polysynovitis with pitting oedema of the hands in older adults. All four diagnostic criteria must be present; RS3PE remains a diagnosis of exclusion.','criteria',
+  `<fieldset class="big-dom art"><legend>Diagnostic criteria (all 4 required)</legend>
+     ${RS3PE_CRIT.map(([id,l])=>`<div class="check-item"><input type="checkbox" id="${id}" onchange="rs3peCalc()"><label for="${id}">${l}</label></div>`).join('')}
+   </fieldset>
+   <fieldset class="big-dom art soft"><legend>Supportive features (not required)</legend>
+     ${RS3PE_SUPPORT.map(([id,l])=>`<div class="check-item"><input type="checkbox" id="${id}" onchange="rs3peCalc()"><label for="${id}">${l}</label></div>`).join('')}
+   </fieldset>
+   <div class="ux-entry-info"><b>Exclude before diagnosing RS3PE: </b>rheumatoid arthritis (incl. late-onset seronegative RA), polymyalgia rheumatica, spondyloarthritis / psoriatic arthritis, crystal arthritis (CPPD), and other causes of hand oedema (heart / kidney / liver failure, venous or lymphatic obstruction, drugs such as DPP-4 inhibitors).<span class="ux-note">RS3PE may be paraneoplastic — screen for solid tumours and haematological malignancy, especially if the response to glucocorticoids is poor or relapse occurs.</span></div>`,
+  `<div><div class="score" id="rs3pe-score">0<small>Diagnostic criteria met (of 4)</small></div></div><span class="pill neutral" id="rs3pe-pill">Enter values</span>`,
+  'Diagnosis = all four Olivé criteria (bilateral pitting oedema of both hands, sudden onset of polyarthritis, age &gt;50 years, RF negative). Supportive features — rapid response to low-dose glucocorticoids, absence of erosions and a remitting course — come from the original McCarty description and are not part of the four criteria. In the Olivé series, some patients evolved to haematological malignancy, so the authors questioned whether RS3PE is a distinct entity.',
+  "Olivé A, del Blanco J, Pons M, Vaquero M, Tena X. The clinical spectrum of remitting seronegative symmetrical synovitis with pitting edema. The Catalán Group for the Study of RS3PE. <i>J Rheumatol.</i> 1997;24(2):333–336. McCarty DJ, O'Duffy JD, Pearson L, Hunter JB. Remitting seronegative symmetrical synovitis with pitting edema. RS3PE syndrome. <i>JAMA.</i> 1985;254(19):2763–2767."
+));
+function rs3peCalc(){
+  const on = id => document.getElementById(id).checked;
+  const met = RS3PE_CRIT.filter(([id])=>on(id)).length;
+  const sup = RS3PE_SUPPORT.filter(([id])=>on(id)).length;
+  document.getElementById('rs3pe-score').innerHTML = met+'<small>Diagnostic criteria met (of 4) · supportive features '+sup+'/'+RS3PE_SUPPORT.length+'</small>';
+  const pill = document.getElementById('rs3pe-pill');
+  if(met===4){ pill.className='pill red'; pill.textContent='Meets Olivé criteria for RS3PE (4/4)'+(sup?' — '+sup+' supportive feature'+(sup>1?'s':''):''); }
+  else { pill.className='pill neutral'; pill.textContent='Does not meet criteria ('+met+'/4) — missing: '+RS3PE_CRIT.filter(([id])=>!on(id)).map(c=>c[2]).join(', '); }
+}
+rs3peCalc();
+
+/* =========================================================
    Original-criteria reference tables (shown collapsed at the
    bottom of every calculator panel)
 ========================================================= */
@@ -4981,15 +5193,17 @@ appendRefTable('sjogren2002', `
   <p class="hint">Primary SS: ≥4/6 (incl. IV or VI) OR ≥3 of the 4 objective items (III/IV/V/VI). Secondary SS: item I or II, plus ≥2 of III/IV/V. Excludes: prior head/neck radiation, hepatitis C, AIDS, pre-existing lymphoma, sarcoidosis, GVHD, current anticholinergic use. Vitali C, Bombardieri S, Jonsson R, et al. <i>Ann Rheum Dis.</i> 2002;61(6):554–558.</p>`);
 
 appendRefTable('cress', `
-  <table><caption>CRESS — 5 domains</caption>
+  <table><caption>CRESS vs STAR — same five domains</caption>
+  <thead><tr><th>Domain</th><th>CRESS (1 each)</th><th>STAR (points)</th></tr></thead>
   <tbody>
-    <tr><td>Systemic</td><td>ClinESSDAI &lt;5</td></tr>
-    <tr><td>Symptoms</td><td>ESSPRI ↓≥1pt or ≥15%</td></tr>
-    <tr><td>Ocular</td><td>Schirmer's ↑≥5mm or OSS ↓≥2pts</td></tr>
-    <tr><td>Salivary</td><td>UWS flow ↑≥25% (or ultrasonography ↓≥25%)</td></tr>
-    <tr><td>Serology</td><td>RF ↓≥25% or IgG ↓≥10%</td></tr>
+    <tr><td>Systemic activity</td><td>ClinESSDAI &lt;5 at follow-up</td><td>ClinESSDAI decrease ≥3 (3)</td></tr>
+    <tr><td>Patient symptoms</td><td colspan="2">ESSPRI decrease ≥1 point or ≥15% (STAR 3)</td></tr>
+    <tr><td>Tear gland</td><td colspan="2">Abnormal at baseline: Schirmer increase ≥5 mm or OSS decrease ≥2; normal at baseline: no change to abnormal (STAR 1)</td></tr>
+    <tr><td>Salivary gland</td><td colspan="2">UWSF increase ≥25% (any increase if 0 at baseline) or ultrasound score decrease ≥25% (STAR 1)</td></tr>
+    <tr><td>Serology</td><td colspan="2">IgG decrease ≥10% or RF decrease ≥25% (STAR 1)</td></tr>
+    <tr><td><b>Responder</b></td><td>≥3 of 5 domains</td><td>≥5 of 9 points</td></tr>
   </tbody></table>
-  <p class="hint">Responder = ≥3/5 domains met. Arends S, de Wolff L, van Nimwegen JF, et al. <i>Lancet Rheumatol.</i> 2021;3(8):e553–e562.</p>`);
+  <p class="hint">Arends S, et al. <i>Lancet Rheumatol.</i> 2021;3(8):e553–e562. Seror R, et al. <i>Ann Rheum Dis.</i> 2022;81(7):979–989, Table 3.</p>`);
 
 appendRefTable('ibp', `
   <table><caption>Calin (1977) vs Berlin (2006) vs ASAS expert (2009)</caption>
@@ -5184,6 +5398,16 @@ appendRefTable('gout2015', `
     <tr><td>Imaging: gout-related joint damage</td><td>≥1 erosion on hand/foot radiograph</td><td>4</td></tr>
   </tbody></table>
   <p class="hint">Serum urate 4–&lt;6 mg/dL, synovial fluid not done, and imaging not done each score 0. Threshold ≥8 (maximum 23). Neogi T, et al. <i>Ann Rheum Dis.</i> 2015;74(10):1789–1798.</p>`);
+
+appendRefTable('rs3pe', `
+  <table><caption>RS3PE diagnostic criteria (Olivé et al. 1997) — all four required</caption>
+  <tbody>
+    <tr><td>1</td><td>Bilateral pitting oedema of both hands</td></tr>
+    <tr><td>2</td><td>Sudden onset of polyarthritis</td></tr>
+    <tr><td>3</td><td>Age &gt;50 years</td></tr>
+    <tr><td>4</td><td>Seronegative for rheumatoid factor</td></tr>
+  </tbody></table>
+  <p class="hint">Original description (McCarty 1985, 10 patients): acute symmetrical polysynovitis of the appendicular joints and flexor tendon sheaths with pitting oedema of the dorsa of the hands and feet in elderly patients, RF absent, no erosions, excellent prognosis with remission. Olivé A, et al. <i>J Rheumatol.</i> 1997;24(2):333–336. McCarty DJ, et al. <i>JAMA.</i> 1985;254(19):2763–2767.</p>`);
 
 appendRefTable('mctd', `
   <table><caption>Criteria proposed to diagnose MCTD — as tabulated in Ortega-Hernandez &amp; Shoenfeld 2012, Table 1</caption>
@@ -5666,11 +5890,11 @@ const RESET = (function(){
 ========================================================= */
 const APP = (function(){
   const GROUPS = [
-    {key:'sle', zh:'紅斑性狼瘡',          en:'SLE',          kw:'狼瘡 紅斑 lupus',                                  ids:['g-sle','sledai','easybilag','clasi','lnpath']},
-    {key:'sjd', zh:'乾燥症',              en:'Sjögren',      kw:'修格蘭 乾燥 sjogren sicca clinessdai star',         ids:['g-sjogren','essdai','esspri','g-cress']},
+    {key:'sle', zh:'紅斑性狼瘡',          en:'SLE',          kw:'狼瘡 紅斑 lupus 器官損傷 緩解 低疾病活動 damage remission t2t', ids:['g-sle','sledai','easybilag','g-t2t','sdi','clasi','lnpath']},
+    {key:'sjd', zh:'乾燥症',              en:'Sjögren',      kw:'修格蘭 乾燥 sjogren sicca clinessdai star',         ids:['g-sjogren','essdai','esspri','cress']},
     {key:'ssc', zh:'全身性硬化症 / MCTD',  en:'SSc / MCTD',   kw:'硬皮症 混合結締組織 scleroderma',                    ids:['ssc2013','mrss','mctd']},
     {key:'iim', zh:'肌炎 + IPAF',         en:'IIM + IPAF',   kw:'肌炎 皮肌炎 抗合成酶 間質性肺病 myositis dermatomyositis ild', ids:['iim2017','assd2025','cdasi','mmt8','ipaf']},
-    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 ra spa psa gout', ids:['acreular2010','das28','cdai','gloess','g-spa','ibp','basdai','asdas','caspar','dapsa','gout2015']},
+    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 水腫 ra spa psa gout rs3pe', ids:['acreular2010','das28','cdai','gloess','g-spa','ibp','basdai','asdas','caspar','dapsa','gout2015','rs3pe']},
     {key:'vas', zh:'血管炎（含 PMR）',     en:'Vasculitis',   kw:'血管炎 風濕性多肌痛 貝西氏 巨細胞 高安 冷凝球蛋白 vasculitis pmr', ids:['gpa2022','mpa2022','egpa2022','gca2022','tak2022','pmr2012','pan1990','cryovasc','g-iga','behcet','ffs','bvas']},
     {key:'oth', zh:'其他',                en:'Others',       kw:'抗磷脂 成人史笛爾 類肉瘤 aps still sarcoidosis',       ids:['g-aps','g-igg4','aosd','sarcoid']},
   ];
@@ -5888,12 +6112,13 @@ const APP = (function(){
       if(sm) sm.remove();
       return {num:c.textContent.trim(), lab};
     }).filter(s=>s.num!=='');
-    const pill = Array.from(res.querySelectorAll('.pill')).find(visible);
+    const pills = Array.from(res.querySelectorAll('.pill')).filter(visible);   /* e.g. CRESS + STAR, CLASI activity + damage */
+    const pill = pills[0];
     if(!scores.length && !pill){ bar.hidden = true; return; }
     const tone = pill ? (['green','yellow','orange','red'].find(t=>pill.classList.contains(t)) || '') : '';
     bar.className = 'res-bar ' + tone + (targetOnScreen ? ' off' : '');
     bar.innerHTML = `${scores.length ? `<span class="rb-scores">${scores.map(s=>`<span class="rb-s"><span class="rb-num">${esc(s.num)}</span>${s.lab?`<span class="rb-lab">${esc(s.lab)}</span>`:''}</span>`).join('')}</span>` : ''}
-      <span class="rb-pill">${pill ? esc(pill.textContent.trim()) : ''}</span>
+      <span class="rb-pill">${esc(pills.map(p=>p.textContent.trim()).join(' · '))}</span>
       <span class="rb-go">${svg('down')}<span>詳細</span></span>`;
     bar.hidden = false;
   }
