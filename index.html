@@ -439,6 +439,17 @@
   fieldset.sle-imm{border-color:var(--green); background:#f3fbf6;}
   fieldset.sle-imm > legend{background:var(--green); color:#fff;}
   fieldset.sle-dom > legend .hint{color:#fff; opacity:.85;}
+  /* 1997 ACR SLE: one block per numbered criterion; a multi-part criterion counts once */
+  .acr97-crit{background:#fff; border:1px solid var(--line); border-radius:9px; padding:8px 10px 2px; margin:8px 0;}
+  .acr97-crit.on{border-color:var(--blue); box-shadow:inset 3px 0 0 var(--blue);}
+  .sle-imm .acr97-crit.on{border-color:var(--green); box-shadow:inset 3px 0 0 var(--green);}
+  .acr97-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; font-size:14px;}
+  .acr97-st{font-size:11.5px; font-weight:700; color:#94a0b2; white-space:nowrap;}
+  .acr97-st.on{color:var(--green);}
+  .acr97-crit.single{padding:8px 10px 8px;}
+  .acr97-crit.single .check-item.ux-toggle{margin-bottom:5px;}
+  .acr97-crit.single .check-item.ux-toggle > label{font-size:14px;}
+  .acr97-def{font-size:12px; color:var(--ink-soft); line-height:1.45; padding:0 4px 2px 6px;}
   /* SDI / LLDAS / DORIS: framed domains with a large coloured title (SLE purple) */
   fieldset.big-dom{border:2px solid #7a3fb0; border-radius:10px; background:#faf6fd; padding:12px 14px 12px; margin-top:14px;}
   fieldset.big-dom > legend{background:#7a3fb0; color:#fff; border-radius:5px; padding:3px 10px; font-size:15px; font-weight:700;}
@@ -664,7 +675,7 @@
     <p>Clinical calculators for Rheumatology — disease activity scores &amp; classification criteria</p>
   </div>
   <nav class="top-tabs" id="topTabs" aria-label="主要導覽"></nav>
-  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/10/06 version</div>
+  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/10/18 version</div>
 </header>
 
 <div class="layout">
@@ -698,6 +709,8 @@
 const CALCS = [
   /* --- SLE --- */
   {id:'sle2019', name:'SLE criteria', cat:'criteria', short:'Classification criteria for systemic lupus erythematosus'},
+  {id:'slicc2012', name:'SLE criteria', cat:'criteria', short:'2012 SLICC classification criteria for systemic lupus erythematosus'},
+  {id:'acr1997', name:'SLE criteria', cat:'criteria', short:'1997 update of the 1982 ACR revised classification criteria for SLE'},
   {id:'sledai', name:'SLEDAI-2K', cat:'activity', short:'SLE Disease Activity Index 2000, for lupus — includes an SRI-4 responder sub-tab'},
   {id:'slerpi', name:'SLE criteria', cat:'criteria', short:'SLE Risk Probability Index — bedside diagnostic probability tool, not a classification instrument'},
   {id:'easybilag', name:'Easy-BILAG (SLE)', cat:'activity', short:'Simplified BILAG-2004 disease activity by organ system — includes a BICLA responder sub-tab'},
@@ -764,8 +777,8 @@ const CALCS = [
 /* Calculators that are versions of the same disease criteria share ONE nav entry and
    switch between member panels with a tab bar (panel ids / calc functions are unchanged). */
 const CALC_GROUPS = [
-  {id:'g-sle', name:'SLE criteria', cat:'criteria', short:'Classification criteria & SLERPI diagnostic probability — 2 tabs',
-   members:[['sle2019','2019 EULAR/ACR classification'],['slerpi','SLERPI (diagnostic probability)']]},
+  {id:'g-sle', name:'SLE criteria', cat:'criteria', short:'2019 EULAR/ACR, 2012 SLICC & 1997 ACR classification criteria, SLERPI diagnostic probability — 4 tabs',
+   members:[['sle2019','2019 EULAR/ACR classification'],['slicc2012','2012 SLICC classification'],['acr1997','1997 ACR (updated 1982) classification'],['slerpi','SLERPI (diagnostic probability)']]},
   {id:'g-sjogren', name:'Sjögren criteria', cat:'criteria', short:"Classification criteria for Sjögren's disease — 2 versions (tabs)",
    members:[['sjogren2016','2016 ACR/EULAR'],['sjogren2002','2002 AECG']]},
   {id:'g-spa', name:'SpA criteria', cat:'criteria', short:'Axial & peripheral spondyloarthritis classification — 2 versions (tabs)',
@@ -1520,6 +1533,153 @@ function sleCalc(){
   else { pill.className='pill neutral'; pill.textContent='Does not meet criteria ('+total+'/10)'; }
 }
 sleCalc();
+
+/* =========================================================
+   10b. 2012 SLICC SLE classification criteria (Petri M, et al. Arthritis Rheum 2012)
+   ≥4 of 17 with ≥1 clinical AND ≥1 immunologic, OR biopsy-proven lupus nephritis with ANA or anti-dsDNA.
+   Criteria are cumulative and need not be present concurrently.
+========================================================= */
+const SLICC_CLIN = [
+  ['acle',  'Acute cutaneous lupus', 'Malar rash (not malar discoid), bullous lupus, TEN variant of SLE, maculopapular or photosensitive lupus rash (in the absence of dermatomyositis), or subacute cutaneous lupus (non-indurated psoriasiform and/or annular polycyclic lesions resolving without scarring)'],
+  ['ccle',  'Chronic cutaneous lupus', 'Classic discoid rash (localised above the neck, or generalised), hypertrophic (verrucous) lupus, lupus panniculitis (profundus), mucosal lupus, lupus tumidus, chilblain lupus, or discoid lupus / lichen planus overlap'],
+  ['oral',  'Oral or nasal ulcers', 'Palate, buccal, tongue, or nasal ulcers — in the absence of other causes (vasculitis, Behçet’s, herpes, IBD, reactive arthritis, acidic foods)'],
+  ['alo',   'Non-scarring alopecia', 'Diffuse thinning or hair fragility with visible broken hairs — in the absence of alopecia areata, drugs, iron deficiency or androgenic alopecia'],
+  ['syn',   'Synovitis', '≥2 joints with swelling or effusion, OR tenderness in ≥2 joints with ≥30 minutes of morning stiffness'],
+  ['sero',  'Serositis', 'Typical pleurisy &gt;1 day, pleural effusion or rub; or typical pericardial pain &gt;1 day, pericardial effusion, rub or pericarditis on ECG — in the absence of infection, uraemia or Dressler’s'],
+  ['renal', 'Renal', 'Urine protein/creatinine (or 24-h urine protein) representing ≥500 mg protein/24 h, OR red blood cell casts'],
+  ['neuro', 'Neurologic', 'Seizures, psychosis, mononeuritis multiplex, myelitis, peripheral or cranial neuropathy, or acute confusional state — in the absence of other known causes'],
+  ['ha',    'Haemolytic anaemia', ''],
+  ['leuk',  'Leukopenia or lymphopenia', 'Leukopenia &lt;4000/mm³ at least once (excluding Felty’s, drugs, portal hypertension), OR lymphopenia &lt;1000/mm³ at least once (excluding corticosteroids, drugs, infection)'],
+  ['plt',   'Thrombocytopenia', '&lt;100,000/mm³ at least once — in the absence of drugs, portal hypertension or TTP'],
+];
+const SLICC_IMM = [
+  ['ana',   'ANA', 'Above laboratory reference range'],
+  ['dsdna', 'Anti-dsDNA', 'Above laboratory reference range (ELISA: twice above the reference range)'],
+  ['sm',    'Anti-Sm', ''],
+  ['apl',   'Antiphospholipid antibody', 'Any of: lupus anticoagulant, false-positive RPR, medium/high-titre anticardiolipin (IgA, IgG or IgM), anti-β2-glycoprotein I (IgA, IgG or IgM)'],
+  ['comp',  'Low complement', 'Low C3, low C4 or low CH50'],
+  ['coombs','Direct Coombs test', 'In the absence of haemolytic anaemia — not counted if clinical criterion 9 (haemolytic anaemia) is present'],
+];
+const sliccItem = ([id,name,desc], i) => `<div class="check-item"><input type="checkbox" id="slicc-${id}" onchange="sliccCalc()"><label for="slicc-${id}"><b>${i+1}. ${name}</b>${desc?`<span class="hint" style="display:block; margin-top:2px;">${desc}</span>`:''}</label></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('slicc2012','SLE criteria',
+  'Classify as SLE with ≥4 of the 17 criteria, including ≥1 clinical AND ≥1 immunologic criterion — or with biopsy-proven lupus nephritis plus ANA or anti-dsDNA. Criteria are cumulative and need not be present at the same time.','criteria',
+  `<div class="field full" style="margin-bottom:10px;">
+     <div class="check-item" style="background:var(--yellow-bg); border-radius:7px; padding:8px 10px;">
+       <input type="checkbox" id="slicc-ln" onchange="sliccCalc()"><label for="slicc-ln"><b>Sufficient criterion (stand-alone):</b> biopsy-proven nephritis compatible with SLE (ISN/RPS 2003) — classifies alone when ANA or anti-dsDNA (immunologic criteria 1–2) is also positive</label>
+     </div></div>
+   <fieldset class="sle-dom sle-clin"><legend>Clinical criteria <span class="hint">(≥1 required)</span><span class="dom-badge zero" id="slicc-cb">0 / 11</span></legend>
+     ${SLICC_CLIN.map(sliccItem).join('')}
+   </fieldset>
+   <fieldset class="sle-dom sle-imm"><legend>Immunologic criteria <span class="hint">(≥1 required)</span><span class="dom-badge zero" id="slicc-ib">0 / 6</span></legend>
+     ${SLICC_IMM.map(sliccItem).join('')}
+   </fieldset>`,
+  `<div><div class="score" id="slicc-score">0<small>Criteria met (of 17)</small></div></div><span class="pill neutral" id="slicc-pill">Enter values</span>`,
+  'Classify as SLE if ≥4 criteria are met with at least 1 clinical and 1 immunologic criterion, OR if there is biopsy-proven nephritis compatible with SLE in the presence of ANA or anti-dsDNA. Criteria are cumulative and need not be present concurrently. Direct Coombs is not counted when haemolytic anaemia is already counted (to avoid double counting). Derivation set: sensitivity 94%, specificity 92%; validation set: sensitivity 97%, specificity 84%.',
+  'Petri M, Orbai AM, Alarcón GS, et al. Derivation and validation of the Systemic Lupus International Collaborating Clinics classification criteria for systemic lupus erythematosus. <i>Arthritis Rheum.</i> 2012;64(8):2677–2686.'
+));
+function sliccCalc(){
+  const on = id => document.getElementById('slicc-'+id).checked;
+  const clin = SLICC_CLIN.filter(([id])=>on(id)).length;
+  const coombsCounts = on('coombs') && !on('ha');                 /* no double counting with haemolytic anaemia */
+  const imm = SLICC_IMM.filter(([id])=>id!=='coombs' && on(id)).length + (coombsCounts?1:0);
+  const total = clin + imm;
+  const cb = document.getElementById('slicc-cb'), ib = document.getElementById('slicc-ib');
+  cb.textContent = clin+' / 11'; cb.classList.toggle('zero', clin===0);
+  ib.textContent = imm+' / 6';  ib.classList.toggle('zero', imm===0);
+  document.getElementById('slicc-score').innerHTML = total+'<small>Criteria met (of 17) · clinical '+clin+' · immunologic '+imm+(on('coombs')&&!coombsCounts?' · Coombs not counted (haemolytic anaemia)':'')+'</small>';
+  const pill = document.getElementById('slicc-pill');
+  const lnRoute = on('ln') && (on('ana') || on('dsdna'));
+  const ruleRoute = total>=4 && clin>=1 && imm>=1;
+  if(lnRoute || ruleRoute){
+    pill.className = 'pill red';
+    pill.textContent = 'Meets SLICC criteria for SLE — '+(lnRoute ? 'biopsy-proven lupus nephritis + ANA/anti-dsDNA' : '')+(lnRoute && ruleRoute ? '; also ' : '')+(ruleRoute ? total+' criteria (clinical '+clin+', immunologic '+imm+')' : '');
+  } else {
+    const why = [];
+    if(total<4) why.push(total+'/4 criteria');
+    if(clin<1) why.push('no clinical criterion');
+    if(imm<1) why.push('no immunologic criterion');
+    if(on('ln') && !(on('ana')||on('dsdna'))) why.push('nephritis needs ANA or anti-dsDNA');
+    pill.className = 'pill neutral';
+    pill.textContent = 'Does not meet criteria — '+why.join(', ');
+  }
+}
+sliccCalc();
+
+/* =========================================================
+   10c. 1997 update of the 1982 ACR revised SLE classification criteria
+   (Tan EM, et al. Arthritis Rheum 1982; Hochberg MC. Arthritis Rheum 1997)
+   ≥4 of 11, serially or simultaneously, during any interval of observation.
+   A multi-part criterion counts once if any of its parts is present.
+========================================================= */
+const ACR97 = [
+  {n:1,  name:'Malar rash', clin:true, parts:[['Fixed erythema, flat or raised, over the malar eminences, tending to spare the nasolabial folds']]},
+  {n:2,  name:'Discoid rash', clin:true, parts:[['Erythematous raised patches with adherent keratotic scaling and follicular plugging; atrophic scarring may occur in older lesions']]},
+  {n:3,  name:'Photosensitivity', clin:true, parts:[['Skin rash as a result of unusual reaction to sunlight, by patient history or physician observation']]},
+  {n:4,  name:'Oral ulcers', clin:true, parts:[['Oral or nasopharyngeal ulceration, usually painless, observed by a physician']]},
+  /* Wording follows Tan 1982, Table 2 (criteria 1–9, 11 unchanged in 1997); criterion 10 as updated in 1997 */
+  {n:5,  name:'Nonerosive arthritis', clin:true, parts:[['Involving 2 or more peripheral joints, characterized by tenderness, swelling, or effusion']]},
+  {n:6,  name:'Pleuritis or pericarditis', clin:true, parts:[
+     ['Pleuritis — convincing history of pleuritic pain or rub heard by a physician or evidence of pleural effusion'],
+     ['Pericarditis — documented by ECG or rub or evidence of pericardial effusion']]},
+  {n:7,  name:'Renal disorder', clin:true, parts:[
+     ['Persistent proteinuria greater than 0.5 grams per day, or greater than 3+ if quantitation not performed'],
+     ['Cellular casts — may be red cell, hemoglobin, granular, tubular, or mixed']]},
+  {n:8,  name:'Neurologic disorder', clin:true, parts:[
+     ['Seizures — in the absence of offending drugs or known metabolic derangements; e.g., uremia, ketoacidosis, or electrolyte imbalance'],
+     ['Psychosis — in the absence of offending drugs or known metabolic derangements, e.g., uremia, ketoacidosis, or electrolyte imbalance']]},
+  {n:9,  name:'Hematologic disorder', clin:true, parts:[
+     ['Hemolytic anemia — with reticulocytosis'],
+     ['Leukopenia — less than 4,000/mm³ total on 2 or more occasions'],
+     ['Lymphopenia — less than 1,500/mm³ on 2 or more occasions'],
+     ['Thrombocytopenia — less than 100,000/mm³ in the absence of offending drugs']]},
+  {n:10, name:'Immunologic disorder', clin:false, parts:[
+     ['Anti-dsDNA'],
+     ['Anti-Sm'],
+     ['Antiphospholipid antibodies (1997 update, replaces the 1982 false-positive syphilis item): abnormal serum IgG or IgM anticardiolipin, OR positive lupus anticoagulant (standard method), OR false-positive serologic test for syphilis known to be positive for at least 6 months and confirmed by Treponema pallidum immobilization or fluorescent treponemal antibody absorption test']]},
+  {n:11, name:'Antinuclear antibody', clin:false, parts:[['An abnormal titer of antinuclear antibody by immunofluorescence or an equivalent assay at any point in time and in the absence of drugs known to be associated with “drug-induced lupus” syndrome']]},
+];
+/* Single-part criterion: the title itself is the toggle, the definition sits below it.
+   Multi-part criterion (a, b, c…): title as a heading, one toggle per part; counts once. */
+const acr97Block = c => c.parts.length===1
+  ? `<div class="acr97-crit single" id="acr97-c${c.n}">
+       <div class="check-item"><input type="checkbox" id="acr97-${c.n}-0" onchange="acr97Calc()"><label for="acr97-${c.n}-0"><b>${c.n}. ${c.name}</b></label></div>
+       <div class="acr97-def">${c.parts[0][0]}</div>
+     </div>`
+  : `<div class="acr97-crit" id="acr97-c${c.n}">
+       <div class="acr97-head"><b>${c.n}. ${c.name}</b><span class="acr97-st" id="acr97-st${c.n}">–</span></div>
+       ${c.parts.map((p,i)=>`<div class="check-item"><input type="checkbox" id="acr97-${c.n}-${i}" onchange="acr97Calc()"><label for="acr97-${c.n}-${i}">${String.fromCharCode(97+i)}. ${p[0]}</label></div>`).join('')}
+     </div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('acr1997','SLE criteria',
+  'The 1982 ACR revised criteria as updated in 1997 (the LE cell item was removed and antiphospholipid antibodies added to the immunologic disorder criterion). Classify as SLE if any ≥4 of the 11 criteria are present, serially or simultaneously, during any interval of observation.','criteria',
+  `<fieldset class="sle-dom sle-clin"><legend>Clinical criteria (1–9)<span class="dom-badge zero" id="acr97-cb">0 / 9</span></legend>
+     ${ACR97.filter(c=>c.clin).map(acr97Block).join('')}
+   </fieldset>
+   <fieldset class="sle-dom sle-imm"><legend>Immunologic criteria (10–11)<span class="dom-badge zero" id="acr97-ib">0 / 2</span></legend>
+     ${ACR97.filter(c=>!c.clin).map(acr97Block).join('')}
+   </fieldset>`,
+  `<div><div class="score" id="acr97-score">0<small>Criteria met (of 11)</small></div></div><span class="pill neutral" id="acr97-pill">Enter values</span>`,
+  'Classify as SLE with ≥4 of 11 criteria, present serially or simultaneously during any interval of observation. Each numbered criterion counts once, even if several of its parts (a, b, c…) are present. Unlike the 2012 SLICC and 2019 EULAR/ACR criteria, a positive ANA is not mandatory and no immunologic criterion is required. In Tan 1982 the criteria are intended “for the purpose of identifying patients in clinical studies”. 1982 performance (177 SLE vs 162 controls): sensitivity 96% (170/177), specificity 96% (155/162). 1997 update: criterion 10 originally read a) positive LE cell preparation, b) anti-DNA, c) anti-Sm, d) false-positive serologic test for syphilis — the LE cell item was deleted and item d was replaced by antiphospholipid antibodies (which still include the false-positive syphilis test). The 1997 update was consensus-based and was not separately validated.',
+  'Tan EM, Cohen AS, Fries JF, et al. The 1982 revised criteria for the classification of systemic lupus erythematosus. <i>Arthritis Rheum.</i> 1982;25(11):1271–1277. Hochberg MC. Updating the American College of Rheumatology revised criteria for the classification of systemic lupus erythematosus. <i>Arthritis Rheum.</i> 1997;40(9):1725.'
+));
+function acr97Calc(){
+  let total = 0, clin = 0, imm = 0;
+  ACR97.forEach(c=>{
+    const k = c.parts.filter((_,i)=>document.getElementById('acr97-'+c.n+'-'+i).checked).length;
+    const met = k>0;
+    if(met){ total++; if(c.clin) clin++; else imm++; }
+    const st = document.getElementById('acr97-st'+c.n);   /* only multi-part criteria have a status chip */
+    if(st){ st.textContent = met ? '✓ met' : '–'; st.classList.toggle('on', met); }
+    document.getElementById('acr97-c'+c.n).classList.toggle('on', met);
+  });
+  const cb = document.getElementById('acr97-cb'), ib = document.getElementById('acr97-ib');
+  cb.textContent = clin+' / 9'; cb.classList.toggle('zero', clin===0);
+  ib.textContent = imm+' / 2';  ib.classList.toggle('zero', imm===0);
+  document.getElementById('acr97-score').innerHTML = total+'<small>Criteria met (of 11) · clinical '+clin+' · immunologic '+imm+'</small>';
+  const pill = document.getElementById('acr97-pill');
+  if(total>=4){ pill.className='pill red'; pill.textContent='Meets 1997 ACR criteria for SLE ('+total+'/11)'; }
+  else { pill.className='pill neutral'; pill.textContent='Does not meet criteria ('+total+'/11, need ≥4)'; }
+}
+acr97Calc();
 
 /* =========================================================
    11. 2016 ACR/EULAR Sjögren Criteria
@@ -4684,6 +4844,42 @@ appendRefTable('sle2019', `
   </tbody></table>
   <p class="hint">Entry criterion: ANA ≥1:80 on HEp-2 cells. Threshold: total ≥10, with ≥1 clinical criterion present. Aringer M, Costenbader K, Daikh D, et al. 2019 EULAR/ACR classification criteria for SLE. <i>Arthritis Rheumatol.</i> 2019;71(9):1400–1412.</p>`);
 
+appendRefTable('slicc2012', `
+  <table><caption>2012 SLICC classification criteria for SLE — 11 clinical + 6 immunologic</caption>
+  <thead><tr><th>Clinical criteria</th><th>Immunologic criteria</th></tr></thead>
+  <tbody>
+    <tr><td>1. Acute or subacute cutaneous lupus</td><td>1. ANA above reference range</td></tr>
+    <tr><td>2. Chronic cutaneous lupus</td><td>2. Anti-dsDNA above reference range (ELISA: ≥2× reference)</td></tr>
+    <tr><td>3. Oral or nasal ulcers</td><td>3. Anti-Sm</td></tr>
+    <tr><td>4. Non-scarring alopecia</td><td>4. Antiphospholipid antibody (LA, false-positive RPR, medium/high-titre aCL or anti-β2GPI — IgA, IgG or IgM)</td></tr>
+    <tr><td>5. Synovitis (≥2 joints)</td><td>5. Low complement (C3, C4 or CH50)</td></tr>
+    <tr><td>6. Serositis</td><td>6. Direct Coombs test without haemolytic anaemia</td></tr>
+    <tr><td>7. Renal (≥500 mg protein/24 h or RBC casts)</td><td></td></tr>
+    <tr><td>8. Neurologic</td><td></td></tr>
+    <tr><td>9. Haemolytic anaemia</td><td></td></tr>
+    <tr><td>10. Leukopenia &lt;4000 or lymphopenia &lt;1000/mm³</td><td></td></tr>
+    <tr><td>11. Thrombocytopenia &lt;100,000/mm³</td><td></td></tr>
+  </tbody></table>
+  <p class="hint">Rule: ≥4 criteria including ≥1 clinical and ≥1 immunologic, OR biopsy-proven nephritis compatible with SLE with ANA or anti-dsDNA. Cumulative — need not be concurrent. Petri M, Orbai AM, Alarcón GS, et al. <i>Arthritis Rheum.</i> 2012;64(8):2677–2686.</p>`);
+
+appendRefTable('acr1997', `
+  <table><caption>1997 update of the 1982 ACR revised criteria for SLE — ≥4 of 11</caption>
+  <thead><tr><th>Criterion</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>1. Malar rash</td><td>Fixed erythema over the malar eminences, sparing the nasolabial folds</td></tr>
+    <tr><td>2. Discoid rash</td><td>Raised patches with adherent keratotic scaling and follicular plugging</td></tr>
+    <tr><td>3. Photosensitivity</td><td>Rash from unusual reaction to sunlight</td></tr>
+    <tr><td>4. Oral ulcers</td><td>Oral or nasopharyngeal ulceration, usually painless</td></tr>
+    <tr><td>5. Nonerosive arthritis</td><td>≥2 peripheral joints</td></tr>
+    <tr><td>6. Pleuritis or pericarditis</td><td>Pleuritis or pericarditis</td></tr>
+    <tr><td>7. Renal disorder</td><td>Proteinuria &gt;0.5 g/day (or &gt;3+), or cellular casts</td></tr>
+    <tr><td>8. Neurologic disorder</td><td>Seizures or psychosis without offending drugs / metabolic cause</td></tr>
+    <tr><td>9. Hematologic disorder</td><td>Hemolytic anemia with reticulocytosis; leukopenia &lt;4000 (≥2 occasions); lymphopenia &lt;1500 (≥2 occasions); thrombocytopenia &lt;100,000</td></tr>
+    <tr><td>10. Immunologic disorder</td><td>Anti-dsDNA; anti-Sm; antiphospholipid antibodies (aCL IgG/IgM, lupus anticoagulant, or false-positive syphilis test ≥6 months)</td></tr>
+    <tr><td>11. Antinuclear antibody</td><td>Abnormal ANA titre, in the absence of drugs</td></tr>
+  </tbody></table>
+  <p class="hint">Definitions transcribed from Tan 1982, Table 2. 1997 changes: criterion 10a (positive LE cell preparation) deleted; 10d (false-positive syphilis serology) replaced by antiphospholipid antibodies. 1982 set: sensitivity 96%, specificity 96%. Tan EM, et al. <i>Arthritis Rheum.</i> 1982;25(11):1271–1277. Hochberg MC. <i>Arthritis Rheum.</i> 1997;40(9):1725.</p>`);
+
 appendRefTable('sjogren2016', `
   <table><caption>2016 ACR/EULAR criteria for primary Sjögren's disease (score ≥4, with ≥1 entry symptom and no exclusions)</caption>
   <thead><tr><th>Item</th><th>Points</th></tr></thead>
@@ -5499,7 +5695,7 @@ const UX = (function(){
     pan1990:      ['Applicability requirement', 'For use in a patient in whom a vasculitis diagnosis has already been established.'],
   };
   const RX_ENTRY_LABEL = /entry|absolute requirement|mandatory|required to apply|sufficient criterion/i;
-  const DOM_TITLE_PANELS = ['sle2019','aps2023','assd2025','lnpath','essdai','bvas','mrss','pmr2012','gout2015','mctd'];   /* larger domain titles */
+  const DOM_TITLE_PANELS = ['sle2019','slicc2012','acr1997','aps2023','assd2025','lnpath','essdai','bvas','mrss','pmr2012','gout2015','mctd'];   /* larger domain titles */
   const NO_GRID_PANELS = ['caspar','cress','ffs'];                                             /* one multi-select item per row */
 
   /* ---------- option-text parsing ---------- */
