@@ -7,9 +7,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RheumCalc">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <title>RheumCalc — Rheumatology Clinical Calculators</title>
 <style>
   :root{
@@ -460,6 +457,63 @@
   fieldset.big-dom.art{border-color:#155ec7; background:#f4f8fe;}
   fieldset.big-dom.art > legend{background:#155ec7;}
   fieldset.big-dom.art > legend .dom-badge{color:#155ec7;}
+  fieldset.big-dom.ssc{border-color:#7a5c2e; background:#fcf9f4;}
+  fieldset.big-dom.ssc > legend{background:#7a5c2e;}
+  fieldset.big-dom.ssc > legend .dom-badge{color:#7a5c2e;}
+  fieldset.big-dom.ssc > legend .dom-badge.zero{color:#fff;}
+  fieldset.big-dom.art > legend .dom-badge.zero{color:#fff;}
+  /* Title-as-toggle row with the definition underneath (SCTC-AI / SCTC-DI / EUSTAR-AI) */
+  .crit-row{padding:2px 0 6px;}
+  .crit-row .check-item.ux-toggle{margin-bottom:3px;}
+  .crit-row .acr97-def{padding:0 4px 0 6px;}
+  .crit-row.addon{margin-left:22px;}
+  /* SPARCC: slice / DVU rows with three sliders */
+  .spa-row{display:grid; grid-template-columns:82px repeat(3,minmax(0,1fr)); gap:6px 12px; align-items:center; padding:7px 0; border-top:1px solid var(--line);}
+  .spa-row:first-of-type{border-top:0;}
+  .spa-row > b{font-size:13.5px;}
+  .spa-cell{display:flex; align-items:center; gap:6px; min-width:0;}
+  .spa-tag{flex:none; width:58px; font-size:10.5px; font-weight:800; color:#155ec7; text-align:center; background:var(--blue-pale); border-radius:5px; padding:3px 0;}
+  .spa-sl{flex:1; min-width:0; accent-color:#155ec7; height:22px; cursor:pointer;}
+  .spa-val{flex:none; min-width:26px; text-align:center; font-weight:800; font-size:13.5px; color:var(--blue-dark); background:var(--blue-pale); border-radius:6px; padding:2px 5px;}
+  @media (max-width:720px){ .spa-row{grid-template-columns:minmax(0,1fr);} }
+  fieldset.big-dom.iim{border-color:#b45f06; background:#fffaf4;}
+  fieldset.big-dom.iim > legend{background:#b45f06;}
+  fieldset.big-dom.iim > legend .dom-badge{color:#b45f06;}
+  /* MMT8: one row per muscle — name + right / left (or a single axial) grade */
+  .mmt8-row{display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr); gap:6px 10px; align-items:center; padding:8px 0; border-top:1px solid #f0e3d3;}
+  .mmt8-row:first-of-type{border-top:0;}
+  .mmt8-name b{font-size:14px;}
+  .mmt8-name .hint{display:block; font-size:11px; color:var(--ink-soft); margin-top:2px;}
+  .mmt8-cell{display:flex; align-items:center; gap:6px; min-width:0;}
+  .mmt8-axial{grid-column:2 / -1;}
+  .mmt8-side{flex:none; width:38px; font-size:11px; font-weight:800; color:#b45f06; text-align:center; background:#fff0e0; border-radius:5px; padding:3px 0;}
+  .mmt8-sl{flex:1; min-width:0; accent-color:#b45f06; height:22px; cursor:pointer;}
+  .mmt8-val{flex:none; min-width:30px; text-align:center; font-weight:800; font-size:14px; color:#7a3f00; background:#fff0e0; border-radius:6px; padding:2px 6px;}
+  .mmt8-uni .mmt8-left{display:none;}
+  .mmt8-uni .mmt8-row{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);}
+  @media (max-width:600px){
+    .mmt8-row, .mmt8-uni .mmt8-row{grid-template-columns:minmax(0,1fr);}   /* phone: name, then one full-width slider per side */
+    .mmt8-name, .mmt8-axial{grid-column:1 / -1;}
+  }
+  @media (max-width:600px){   /* mSASSS on phones: upper and lower corner on separate lines so all 0–3/x buttons fit */
+    #panel-msasss fieldset table, #panel-msasss fieldset tbody{display:block; width:100%;}
+    #panel-msasss fieldset thead, #panel-msasss fieldset tfoot{display:none;}
+    #panel-msasss fieldset tbody tr{display:grid; grid-template-columns:38px minmax(0,1fr); row-gap:4px; align-items:center; padding:5px 0; border-bottom:1px solid var(--line);}
+    #panel-msasss fieldset tbody td{border-bottom:0 !important; padding:0 !important;}
+    #panel-msasss fieldset tbody td:first-child{grid-column:1; grid-row:1 / span 2;}
+    #panel-msasss fieldset tbody td:not(:first-child){grid-column:2; display:flex; align-items:center; gap:6px;}
+    #panel-msasss fieldset tbody td.ms-na{display:none;}
+    #panel-msasss fieldset tbody td:not(:first-child)::before{flex:none; width:44px; font-size:11px; font-weight:800; color:var(--blue-dark); text-align:left;}
+    #panel-msasss fieldset tbody td:nth-child(2)::before{content:'Upper';}
+    #panel-msasss fieldset tbody td:nth-child(3)::before{content:'Lower';}
+    #panel-msasss fieldset tbody td > .opt-row{flex:1; min-width:0;}
+  }
+  .copy-out{margin-top:10px; border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff;}
+  .copy-out-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;}
+  .copy-out-head span{font-size:12px; font-weight:700; color:var(--ink-soft);}
+  .copy-out-btn{flex:none; font:inherit; font-size:12.5px; font-weight:700; color:var(--blue-dark); background:#eef4ff; border:1px solid #c9dcf8; border-radius:8px; padding:5px 12px; cursor:pointer;}
+  .copy-out-btn.done{color:var(--green); background:#ecfdf3; border-color:#b7e4c7;}
+  .copy-out textarea{display:block; width:100%; box-sizing:border-box; border:0; outline:0; resize:none; overflow:hidden; background:transparent; font:inherit; font-size:13px; line-height:1.5; color:var(--ink); padding:0;}
   fieldset.big-dom.soft{border-style:dashed; border-color:#9db8e3; background:#fbfcfe;}
   fieldset.big-dom.soft > legend{background:#5b7fb8;}
   /* CRESS / STAR: framed domains with a large coloured title (same pattern as SLE 2019) */
@@ -675,7 +729,7 @@
     <p>Clinical calculators for Rheumatology — disease activity scores &amp; classification criteria</p>
   </div>
   <nav class="top-tabs" id="topTabs" aria-label="主要導覽"></nav>
-  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/10/18 version</div>
+  <div class="credit">produced by <b>Kaku</b> from <b>NTUH</b>, 2026/11/10 version</div>
 </header>
 
 <div class="layout">
@@ -728,22 +782,29 @@ const CALCS = [
   /* --- Systemic sclerosis --- */
   {id:'ssc2013', name:'SSc criteria', cat:'criteria', short:'Classification criteria for systemic sclerosis'},
   {id:'mrss', name:'mRSS', cat:'activity', short:'Modified Rodnan Skin Score, for systemic sclerosis'},
+  {id:'sctcai', name:'SSc activity / damage indices', cat:'activity', short:'Scleroderma Clinical Trials Consortium Activity Index (0–140)'},
+  {id:'sctcdi', name:'SSc activity / damage indices', cat:'activity', short:'Scleroderma Clinical Trials Consortium Damage Index (0–55)'},
+  {id:'eustarai', name:'SSc activity / damage indices', cat:'activity', short:'2017 revised EUSTAR activity index (0–10)'},
+  {id:'detect', name:'DETECT (SSc-PAH screening)', cat:'activity', short:'Two-step algorithm for referral to echocardiography and right heart catheterisation in SSc'},
   {id:'mctd', name:'MCTD criteria', cat:'criteria', short:'Mixed connective tissue disease — Alarcón-Segovia, Kasukawa & Kahn criteria'},
   /* --- Myositis --- */
   {id:'iim2017', name:'IIM criteria', cat:'criteria', short:'Classification criteria for idiopathic inflammatory myopathies & subgroups'},
   {id:'cdasi', name:'CDASI', cat:'activity', short:'Cutaneous Dermatomyositis Disease Area & Severity Index'},
-  {id:'mmt8', name:'MMT8', cat:'activity', short:'Manual Muscle Testing — 8 muscle groups, for myositis'},
+  {id:'mmt8', name:'MMT8', cat:'activity', short:'Manual Muscle Testing — 8 muscle groups (neck + right/left), for myositis; 0–150 or unilateral 0–80'},
   /* --- RA --- */
   {id:'acreular2010', name:'RA criteria', cat:'criteria', short:'Classification criteria for rheumatoid arthritis'},
   {id:'das28', name:'DAS28 (ESR / CRP)', cat:'activity', short:'Disease Activity Score — 28 joints, for rheumatoid arthritis'},
   {id:'cdai', name:'CDAI / SDAI', cat:'activity', short:'Clinical & Simplified Disease Activity Index for RA — two tabs'},
+  {id:'boolean', name:'Boolean RA remission', cat:'activity', short:'ACR/EULAR Boolean remission — 2022 Boolean 2.0 and 2011 definition'},
   {id:'gloess', name:'GLOESS (US Synovitis)', cat:'activity', short:'Global OMERACT-EULAR ultrasound Synovitis Score — grey-scale + power Doppler joint total'},
   /* --- SpA --- */
   {id:'axspa', name:'SpA criteria', cat:'criteria', short:'Classification criteria for axial & peripheral spondyloarthritis'},
   {id:'spa2026', name:'SpA criteria', cat:'criteria', short:'Revised axSpA classification criteria — table format (CLASSIC study)'},
   {id:'ibp', name:'Inflammatory back pain criteria', cat:'criteria', short:'Calin (1977), Berlin (2006) & ASAS expert (2009) criteria'},
   {id:'basdai', name:'BASDAI', cat:'activity', short:'Bath Ankylosing Spondylitis Disease Activity Index'},
-  {id:'asdas', name:'ASDAS-CRP', cat:'activity', short:'Ankylosing Spondylitis Disease Activity Score'},
+  {id:'asdas', name:'ASDAS (CRP / ESR)', cat:'activity', short:'Ankylosing Spondylitis Disease Activity Score — ASDAS-CRP and ASDAS-ESR'},
+  {id:'sparcc', name:'SPARCC MRI index', cat:'activity', short:'SPARCC MRI inflammation score — sacroiliac joints (0–72) and spine (0–108)'},
+  {id:'msasss', name:'mSASSS', cat:'activity', short:'Modified Stoke Ankylosing Spondylitis Spine Score — radiographic damage (0–72)'},
   /* --- PsA --- */
   {id:'caspar', name:'Psoriatic arthritis (CASPAR) criteria', cat:'criteria', short:'Classification criteria for psoriatic arthritis'},
   {id:'dapsa', name:'DAPSA', cat:'activity', short:'Disease Activity in Psoriatic Arthritis'},
@@ -787,6 +848,8 @@ const CALC_GROUPS = [
    members:[['iga2010','2010 EULAR/PRINTO/PRES'],['hsp1990','1990 ACR (legacy HSP)']]},
   {id:'g-igg4', name:'IgG4-RD criteria', cat:'criteria', short:'IgG4-related disease — classification & diagnostic criteria (tabs)',
    members:[['igg4rd2019','2019 ACR/EULAR classification'],['igg4rd2020','2020 revised comprehensive diagnostic (RCD)']]},
+  {id:'g-sscact', name:'SSc activity / damage indices', cat:'activity', short:'Systemic sclerosis — SCTC Activity Index, SCTC Damage Index & EUSTAR activity index (tabs)',
+   members:[['sctcai','SCTC-AI (activity)'],['sctcdi','SCTC-DI (damage / chronicity)'],['eustarai','EUSTAR-AI (2017)']]},
   {id:'g-t2t', name:'LLDAS / DORIS remission', cat:'activity', short:'SLE treat-to-target states — low disease activity (LLDAS) & remission (DORIS 2021) (tabs)',
    members:[['lldas','LLDAS (low disease activity)'],['doris','DORIS 2021 remission']]},
   {id:'g-aps', name:'APS criteria', cat:'criteria', short:'Antiphospholipid syndrome — 2023 ACR/EULAR & 2006 revised Sapporo (tabs)',
@@ -1190,7 +1253,7 @@ panelsRoot.insertAdjacentHTML('beforeend', panelShell('acreular2010','RA criteri
        <select id="ac-sero" onchange="acCalc()">
          <option value="0">Negative RF and negative ACPA (0 pts)</option>
          <option value="2">Low-positive RF or low-positive ACPA (2 pts)</option>
-         <option value="3">High-positive RF or high-positive ACPA (3 pts)</option>
+         <option value="3">High-positive RF or high-positive ACPA (≥3× ULN) (3 pts)</option>
        </select>
      </div>
      <div class="field">
@@ -1253,8 +1316,8 @@ basCalc();
 /* =========================================================
    6. ASDAS-CRP
 ========================================================= */
-panelsRoot.insertAdjacentHTML('beforeend', panelShell('asdas','ASDAS-CRP',
-  'Ankylosing Spondylitis Disease Activity Score using CRP.','activity',
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('asdas','ASDAS (CRP / ESR)',
+  'Ankylosing Spondylitis Disease Activity Score. Enter CRP, ESR or both; each entered marker gives its own score.','activity',
   `<div class="grid single">
      <div class="field"><label>Back pain (VAS 0–10)</label>
        <div class="range-row"><input type="range" id="as-back" min="0" max="10" step="0.1" value="0" oninput="asCalc()"><span class="val" id="as-back-val">0</span></div></div>
@@ -1264,11 +1327,19 @@ panelsRoot.insertAdjacentHTML('beforeend', panelShell('asdas','ASDAS-CRP',
        <div class="range-row"><input type="range" id="as-pga" min="0" max="10" step="0.1" value="0" oninput="asCalc()"><span class="val" id="as-pga-val">0</span></div></div>
      <div class="field"><label>Peripheral pain / swelling (VAS 0–10)</label>
        <div class="range-row"><input type="range" id="as-periph" min="0" max="10" step="0.1" value="0" oninput="asCalc()"><span class="val" id="as-periph-val">0</span></div></div>
-     <div class="field"><label>CRP (mg/dL) <span class="hint">mg/L ÷ 10 · values &lt;0.2 mg/dL are scored as 0.2</span></label><input type="number" id="as-crp" min="0" step="0.01" value="0.5" oninput="asCalc()"></div>
+     <div class="field"><label>CRP (mg/dL) <span class="hint">mg/L ÷ 10 · values &lt;0.2 mg/dL are scored as 0.2</span></label><input type="number" id="as-crp" min="0" step="0.01" oninput="asCalc()"></div>
+     <div class="field"><label>ESR (mm/h)</label><input type="number" id="as-esr" min="0" step="1" oninput="asCalc()"></div>
    </div>`,
-  `<div><div class="score" id="as-score">–<small>ASDAS-CRP</small></div></div><span class="pill neutral" id="as-pill">Enter values</span>`,
-  'Inactive &lt;1.3 · Low 1.3–&lt;2.1 · High 2.1–3.5 · Very high &gt;3.5 (2018 ASAS nomenclature update; the 1.3–&lt;2.1 band was formerly called "moderate"). CRP is entered in mg/dL and converted to mg/L (×10) for the formula. CRP values &lt;0.2 mg/dL (= 2 mg/L) or below the assay detection limit are replaced by 0.2 mg/dL before calculation, so the lowest possible ASDAS-CRP is ≈0.64, not 0.',
-  'Lukas C, et al. <i>Ann Rheum Dis.</i> 2009;68(1):18–24. Machado P, Navarro-Compán V, Landewé R, et al. Calculating the ASDAS if the conventional CRP is below the limit of detection or if high-sensitivity CRP is used: an analysis in the DESIR cohort. <i>Arthritis Rheumatol.</i> 2015;67(2):408–413.'
+  `<div style="display:flex; gap:24px; flex-wrap:wrap;">
+     <div><div class="score" id="as-score">–<small>ASDAS-CRP</small></div></div>
+     <div><div class="score" id="as-esr-score">–<small>ASDAS-ESR</small></div></div>
+   </div>
+   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+     <span class="pill neutral" id="as-pill">CRP: enter values</span>
+     <span class="pill neutral" id="as-esr-pill">ESR: enter values</span>
+   </div>`,
+  'Inactive &lt;1.3 · Low 1.3–&lt;2.1 · High 2.1–3.5 · Very high &gt;3.5 (2018 ASAS nomenclature update; the 1.3–&lt;2.1 band was formerly called "moderate"). ASAS prefers ASDAS-CRP and lists ASDAS-ESR as the alternative. CRP is entered in mg/dL and converted to mg/L (×10) for the formula. CRP values &lt;0.2 mg/dL (= 2 mg/L) or below the assay detection limit are replaced by 0.2 mg/dL before calculation, so the lowest possible ASDAS-CRP is ≈0.64, not 0.',
+  'Lukas C, et al. <i>Ann Rheum Dis.</i> 2009;68(1):18–24. ASAS ASDAS calculator, asas-group.org. Machado P, Navarro-Compán V, Landewé R, et al. Calculating the ASDAS if the conventional CRP is below the limit of detection or if high-sensitivity CRP is used: an analysis in the DESIR cohort. <i>Arthritis Rheumatol.</i> 2015;67(2):408–413.'
 ));
 function asCalc(){
   ['back','stiff','pga','periph'].forEach(k=>{
@@ -1278,16 +1349,26 @@ function asCalc(){
   const pga=+document.getElementById('as-pga').value, periph=+document.getElementById('as-periph').value;
   /* Input in mg/dL; the published formula uses mg/L (×10).
      ASAS rule (Machado 2015): CRP <2 mg/L (= 0.2 mg/dL) or below the assay's detection limit is replaced by 2 mg/L */
-  const crp=Math.max((+document.getElementById('as-crp').value||0)*10, 2);
-  const score = roundTo(0.121*back + 0.058*stiff + 0.110*pga + 0.073*periph + 0.579*Math.log(crp+1), 2);
-  let level,label;
-  if(score<1.3){level='green';label='Inactive disease';}
-  else if(score<2.1){level='low';label='Low disease activity';}
-  else if(score<=3.5){level='moderate';label='High activity';}
-  else {level='high';label='Very high activity';}
-  document.getElementById('as-score').innerHTML=fmt(score,2)+'<small>ASDAS-CRP</small>';
-  document.getElementById('as-pill').className='pill '+pillClass(level);
-  document.getElementById('as-pill').textContent=label;
+  const crpRaw=document.getElementById('as-crp').value, esrRaw=document.getElementById('as-esr').value;
+  const show=(scoreId,pillId,tag,score)=>{
+    const pill=document.getElementById(pillId);
+    if(score===null){
+      document.getElementById(scoreId).innerHTML='–<small>ASDAS-'+tag+'</small>';
+      pill.className='pill neutral'; pill.textContent=tag+': enter values';
+      return;
+    }
+    let level,label;
+    if(score<1.3){level='green';label='Inactive disease';}
+    else if(score<2.1){level='low';label='Low disease activity';}
+    else if(score<=3.5){level='moderate';label='High activity';}
+    else {level='high';label='Very high activity';}
+    document.getElementById(scoreId).innerHTML=fmt(score,2)+'<small>ASDAS-'+tag+'</small>';
+    pill.className='pill '+pillClass(level);
+    pill.textContent='ASDAS-'+tag+': '+label;
+  };
+  const crp=Math.max((+crpRaw||0)*10, 2);
+  show('as-score','as-pill','CRP', crpRaw==='' ? null : roundTo(0.121*back + 0.058*stiff + 0.110*pga + 0.073*periph + 0.579*Math.log(crp+1), 2));
+  show('as-esr-score','as-esr-pill','ESR', esrRaw==='' ? null : roundTo(0.079*back + 0.069*stiff + 0.113*pga + 0.086*periph + 0.293*Math.sqrt(+esrRaw), 2));
 }
 asCalc();
 
@@ -1297,7 +1378,7 @@ asCalc();
 const SLEDAI_ITEMS = [
   ['Seizure',8],['Psychosis',8],['Organic brain syndrome',8],['Visual disturbance',8],
   ['Cranial nerve disorder',8],['Lupus headache',8],['CVA (stroke)',8],['Vasculitis',8],
-  ['Arthritis (≥2 joints, pain + inflammation)',4],['Myositis',4],['Urinary casts',4],
+  ['Arthritis (≥2 joints, pain + inflammation)',4],['Myositis',4],['Urinary casts (heme-granular or RBC casts)',4],
   ['Hematuria (&gt;5 RBC/hpf)',4],['Proteinuria (&gt;0.5 g/24h)',4],['Pyuria (&gt;5 WBC/hpf)',4],
   ['New rash',2],['Alopecia',2],['Mucosal ulcers',2],['Pleurisy',2],['Pericarditis',2],
   ['Low complement (C3/C4/CH50)',2],['Increased DNA binding (anti-dsDNA)',2],
@@ -1311,7 +1392,7 @@ panelsRoot.insertAdjacentHTML('beforeend', panelShell('sledai','SLEDAI-2K',
    </div>
    <div id="sledai-tab-main">
    <fieldset class="full" style="margin-top:6px;">
-     <legend>Descriptors</legend>
+     <legend>Descriptors <span class="hint">— present at the visit or within the preceding 10 days</span></legend>
      <div style="columns:2 320px; column-gap:20px;">
      ${SLEDAI_ITEMS.map((it,i)=>`
        <div class="check-item"><input type="checkbox" id="sl-${i}" data-w="${it[1]}" onchange="slCalc()">
@@ -2189,11 +2270,12 @@ const BILAG_RENAL_CHECKS = [
   {id:'nephrotic', name:'Nephrotic syndrome (heavy proteinuria, hypoalbuminaemia, oedema)', pts:100},
 ];
 const BILAG_RENAL_RADIOS = [
-  {id:'pcr', name:'Proteinuria (urine protein-creatinine ratio, or equivalent 24h protein/dipstick)', opts:[
-    [0,'&lt;25 mg/mmol, or any level improved by ≥25%'],
-    [1,'&gt;25 mg/mmol, not meeting a more severe tier below'],
-    [10,'50–100 mg/mmol, not improved by ≥25%'],
-    [1000,'&gt;100 mg/mmol, not improved by ≥25%'],
+  /* BILAG-2004 publishes UPCR in mg/mmol; shown in mg/g (1 mg/mmol ≈ 8.84 mg/g): 25 → 221, 50 → 442, 100 → 884 */
+  {id:'pcr', name:'Proteinuria (UPCR in mg/g, or equivalent 24h protein/dipstick)', opts:[
+    [0,'&lt;221 mg/g, or any level improved by ≥25%'],
+    [1,'&gt;221 mg/g, not meeting a more severe tier below'],
+    [10,'442–884 mg/g, not improved by ≥25%'],
+    [1000,'&gt;884 mg/g, not improved by ≥25%'],
   ]},
   {id:'gfr', name:'GFR (ml/min/1.73m²) — deteriorating renal function', opts:[
     [0,'Normal / no significant deterioration'],
@@ -2495,6 +2577,7 @@ panelsRoot.insertAdjacentHTML('beforeend', panelShell('easybilag','Easy-BILAG �
    <div class="notes" style="margin-bottom:14px; margin-top:14px;">
      All nine domains now use the <b>full official BILAG-2004 glossary and grading logic</b>, verified against the BILAG-2004 index score sheet (Sociedad Española de Reumatología hosted copy) and cross-checked item-by-item against an independent Easy-BILAG implementation. Constitutional and Renal use the official numeric-points encoding (summed, then thresholded); Haematological uses direct lab-value-to-grade lookup (worst parameter wins); the other six domains (Mucocutaneous, MSK, CardioResp, NeuroPsych, GI, Ophthalmic) use the complete glossary item list per domain, each item individually tariffed to a grade at Improving/Same/Worse/New exactly as the official score sheet colour-codes it — the domain grade is the single worst grade triggered by any one item ("Same" keeps that item's own tariff; only "Improving" steps it down). This is a faithful re-implementation of the published index, not the licensed Easy-BILAG software itself — for clinical or research scoring, use the official BILAG-2004 documentation (University of Leeds). Constitutional, Renal, and Haematological each show their point/grade thresholds directly at the top of the domain (not just in the reference notes below) and a live running point total as you click.
    </div>
+   <div class="ux-entry-info" style="margin:0 0 12px;"><b>Assessment window: </b>score manifestations attributable to SLE activity in the <b>last 4 weeks</b>, compared with the previous 4 weeks.<span class="ux-note"><b>D</b> = previous (system previously affected, no current activity) · <b>E</b> = never affected. UPCR is shown in mg/g (1 mg/mmol ≈ 8.84 mg/g).</span></div>
    <div id="bilag-domains">${BILAG_DOMAINS.map(bilagRenderDomain).join('')}</div>
    </div>
    <div id="easybilag-tab-bicla" style="display:none;">
@@ -3491,34 +3574,472 @@ cdasiCalc();
 /* =========================================================
    35. MMT8 — Manual Muscle Testing, 8 muscle groups
 ========================================================= */
+/* IMACS MMT8 scoring key (MMT8 testing procedures, 2007): neck flexors = axial, scored once (0–10);
+   the other 7 groups are scored right and left (0–10 each).
+   Unilateral (right side; left only if right cannot be tested) = 0–80, bilateral = 0–150.
+   Subscores: axial 0–10, proximal 0–100 (5 groups × 2), distal 0–40 (2 groups × 2). */
 const MMT8_MUSCLES = [
-  {id:'neck', name:'Neck flexors'},
-  {id:'delt', name:'Deltoid (shoulder abductors)'},
-  {id:'bicep', name:'Biceps brachii (elbow flexors)'},
-  {id:'wrist', name:'Wrist extensors'},
-  {id:'glutmed', name:'Gluteus medius (hip abductors)'},
-  {id:'glutmax', name:'Gluteus maximus (hip extensors)'},
-  {id:'quad', name:'Quadriceps (knee extensors)'},
-  {id:'ankle', name:'Ankle dorsiflexors'},
+  {id:'neck',    name:'Neck flexors',                        grp:'axial', ag:'Supine',              ge:'Sidelying'},
+  {id:'delt',    name:'Deltoid middle (shoulder abductors)', grp:'prox',  ag:'Sitting',             ge:'Supine'},
+  {id:'bicep',   name:'Biceps brachii (elbow flexors)',      grp:'prox',  ag:'Sitting',             ge:'Sitting / sidelying'},
+  {id:'glutmax', name:'Gluteus maximus (hip extensors)',     grp:'prox',  ag:'Prone',               ge:'Sidelying'},
+  {id:'glutmed', name:'Gluteus medius (hip abductors)',      grp:'prox',  ag:'Sidelying',           ge:'Supine'},
+  {id:'quad',    name:'Quadriceps (knee extensors)',         grp:'prox',  ag:'Sitting',             ge:'Sidelying'},
+  {id:'wrist',   name:'Wrist extensors',                     grp:'dist',  ag:'Sitting (pronation)', ge:'Sitting (neutral)'},
+  {id:'ankle',   name:'Ankle dorsiflexors',                  grp:'dist',  ag:'Sitting',             ge:'Sidelying'},
 ];
+/* Kendall 0–10 slider per side (T / trace counts as 0); default 10 = normal */
+const mmt8Sel = (id, label) => `<input type="range" id="${id}" class="mmt8-sl" min="0" max="10" step="1" value="10" aria-label="${label}" oninput="mmt8Calc()"><span class="mmt8-val" id="${id}-v">10</span>`;
+const mmt8Row = m => `<div class="mmt8-row">
+    <div class="mmt8-name"><b>${m.name}</b><span class="hint">Anti-gravity: ${m.ag} · Gravity-eliminated: ${m.ge}</span></div>
+    ${m.grp==='axial'
+      ? `<div class="mmt8-cell mmt8-axial"><span class="mmt8-side">Axial</span>${mmt8Sel('mmt8-'+m.id, m.name)}</div>`
+      : `<div class="mmt8-cell"><span class="mmt8-side">R</span>${mmt8Sel('mmt8-'+m.id+'-R', m.name+' right')}</div>
+         <div class="mmt8-cell mmt8-left"><span class="mmt8-side">L</span>${mmt8Sel('mmt8-'+m.id+'-L', m.name+' left')}</div>`}
+  </div>`;
+const mmt8Dom = (grp, title) => `<fieldset class="big-dom iim"><legend>${title}<span class="dom-badge" id="mmt8-b-${grp}">–</span></legend>
+    ${MMT8_MUSCLES.filter(m=>m.grp===grp).map(mmt8Row).join('')}</fieldset>`;
 panelsRoot.insertAdjacentHTML('beforeend', panelShell('mmt8','MMT8 — Manual Muscle Testing (8 muscles)',
-  'Expanded 0–10 MRC-based manual muscle strength testing of 8 muscle groups, part of the IMACS core set for idiopathic inflammatory myopathies. Tested unilaterally — generally the right side, unless it cannot be tested, in which case use the left.','activity',
-  `<div class="grid single">
-   ${MMT8_MUSCLES.map(m=>`<div class="field full"><label>${m.name}</label>
-     <select id="mmt8-${m.id}" onchange="mmt8Calc()">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${v===10?' selected':''}>${v}${v===0?' — Zero (no contraction)':''}${v===10?' — Normal':''}</option>`).join('')}</select></div>`).join('')}
-   </div>`,
-  `<div><div class="score" id="mmt8-score">80<small>Total MMT8 (0–80)</small></div></div><span class="pill neutral" id="mmt8-pill">Enter values</span>`,
-  'Lower score = weaker (worse). 0 = no visible/palpable contraction; 10 = holds test position against strong/maximal resistance (normal). Intermediate grades follow the Kendall expanded MRC scale (Trace/Poor/Fair/Good ranges).',
-  'Rider LG, Koziol D, Giannini EH, et al. Validation of manual muscle testing and a subset of eight muscles for adult and juvenile idiopathic inflammatory myopathies. <i>Arthritis Care Res (Hoboken).</i> 2010;62(4):465–472.'
+  'IMACS manual muscle testing of 8 muscle groups on the Kendall 0–10 scale. Neck flexors are axial and scored once; the other 7 groups are scored on the right and left. Bilateral total 0–150; unilateral (right side, or left if the right cannot be tested) 0–80.','activity',
+  `<div class="toggle-row">
+     <div class="toggle-btn active" id="mmt8-btn-bi" onclick="mmt8SetMode('bi')">Bilateral (0–150)</div>
+     <div class="toggle-btn" id="mmt8-btn-uni" onclick="mmt8SetMode('uni')">Unilateral — right side (0–80)</div>
+   </div>`
+  + mmt8Dom('axial','Axial')
+  + mmt8Dom('prox','Proximal')
+  + mmt8Dom('dist','Distal'),
+  `<div><div class="score" id="mmt8-score">150<small>MMT8</small></div></div><span class="pill green" id="mmt8-pill">MMT8 = 150/150</span>`,
+  'Grades (Kendall 0–10 / MRC): 0 no contraction or trace (T) without movement · 1 partial range in the horizontal (gravity-eliminated) plane · 2 full range, gravity-eliminated · 3 partial range against gravity · 4 gradual release from test position (descent ≥3 s) · 5 holds test position for 3 s without added pressure · 6–10 holds against slight → strong pressure (force applied for 3 s). Grade 3 can only be given in the standard anti-gravity position; grades 3–5 should be re-tested for the next higher grade after 60 s of recovery. Lower score = weaker. Recommended order: sitting (deltoid, biceps, wrist extensors, quadriceps, ankle dorsiflexors) → supine (neck flexors) → sidelying (gluteus medius) → prone (gluteus maximus); test right then left for each group.',
+  'Manual Muscle Testing Procedures for MMT8 Testing (IMACS), June 18, 2007 — scoring key and Kendall Key to Muscle Grading (© 1993 Florence P. Kendall). Rider LG, Koziol D, Giannini EH, et al. Validation of manual muscle testing and a subset of eight muscles for adult and juvenile idiopathic inflammatory myopathies. <i>Arthritis Care Res (Hoboken).</i> 2010;62(4):465–472.'
 ));
+window._mmt8Mode = 'bi';
+function mmt8SetMode(mode){
+  window._mmt8Mode = mode;
+  document.getElementById('mmt8-btn-bi').classList.toggle('active', mode==='bi');
+  document.getElementById('mmt8-btn-uni').classList.toggle('active', mode==='uni');
+  document.getElementById('panel-mmt8').classList.toggle('mmt8-uni', mode==='uni');
+  mmt8Calc();
+}
 function mmt8Calc(){
-  const total = MMT8_MUSCLES.reduce((s,m)=>s+(+document.getElementById('mmt8-'+m.id).value||0),0);
-  document.getElementById('mmt8-score').innerHTML = total+'<small>Total MMT8 (0–80)</small>';
+  const uni = window._mmt8Mode==='uni';
+  const v = id => { const el = document.getElementById(id); document.getElementById(id+'-v').textContent = el.value; return +el.value; };
+  const sub = {axial:0, prox:0, dist:0}, max = {axial:10, prox:uni?50:100, dist:uni?20:40};
+  let R = 0, L = 0;
+  MMT8_MUSCLES.forEach(m=>{
+    if(m.grp==='axial'){ sub.axial += v('mmt8-'+m.id); return; }
+    const r = v('mmt8-'+m.id+'-R'); sub[m.grp] += r; R += r;
+    const l = v('mmt8-'+m.id+'-L'); if(!uni){ sub[m.grp] += l; L += l; }
+  });
+  ['axial','prox','dist'].forEach(g=>{ document.getElementById('mmt8-b-'+g).textContent = sub[g]+' / '+max[g]; });
+  const total = sub.axial + sub.prox + sub.dist, tmax = uni ? 80 : 150;
+  const parts = 'Axial '+sub.axial+'/10 · Proximal '+sub.prox+'/'+max.prox+' · Distal '+sub.dist+'/'+max.dist
+    + (uni ? '' : ' · Right '+R+'/70 · Left '+L+'/70');
+  document.getElementById('mmt8-score').innerHTML = total+'<small>MMT8 '+(uni?'unilateral':'bilateral')+' (0–'+tmax+') · '+parts+'</small>';
   const pill = document.getElementById('mmt8-pill');
-  pill.className = total===80 ? 'pill green' : (total>=70 ? 'pill yellow' : (total>=50 ? 'pill orange' : 'pill red'));
-  pill.textContent = 'MMT8 = '+total+'/80';
+  const pct = total/tmax;
+  pill.className = 'pill '+(pct===1 ? 'green' : pct>=0.875 ? 'yellow' : pct>=0.625 ? 'orange' : 'red');
+  pill.textContent = 'MMT8 = '+total+'/'+tmax;
 }
 mmt8Calc();
+
+/* =========================================================
+   56. Boolean RA remission — ACR/EULAR 2011 (Felson) and 2022 revision (Studenic)
+   TJC ≤1, SJC ≤1, CRP ≤1 mg/dL and PtGA ≤1 (2011) or ≤2 (Boolean 2.0).
+========================================================= */
+const boolNum = (id,label,hint,max,step) => `<div class="field"><label>${label} <span class="hint">${hint}</span></label><input type="number" id="${id}" min="0"${max?` max="${max}"`:''} step="${step}" placeholder="enter value" oninput="boolCalc()"></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('boolean','Boolean remission in RA',
+  'ACR/EULAR Boolean definition of remission — every item must be met at the same time point. Both the 2022 revision (Boolean 2.0) and the original 2011 definition are shown.','activity',
+  `<fieldset class="big-dom art"><legend>Boolean items</legend>
+     <div class="grid">
+       ${boolNum('bool-tjc','Tender joint count','(≤1)',28,1)}
+       ${boolNum('bool-sjc','Swollen joint count','(≤1)',28,1)}
+       ${boolNum('bool-crp','CRP','mg/dL (≤1)',0,0.01)}
+       ${boolNum('bool-ptga','Patient global assessment','0–10 (Boolean 2.0 ≤2 · 2011 ≤1)',10,0.1)}
+     </div>
+     <div class="hint" id="bool-detail" style="margin-top:10px;"></div>
+   </fieldset>`,
+  `<div><div class="score" id="bool-score">–<small>Items met for Boolean 2.0 (of 4)</small></div></div>
+   <div class="cs-pills"><span class="pill neutral" id="bool-pill2">Boolean 2.0: enter values</span><span class="pill neutral" id="bool-pill1">2011 Boolean: enter values</span></div>`,
+  'Boolean 2.0 (2022 ACR/EULAR): TJC ≤1, SJC ≤1, CRP ≤1 mg/dL and PtGA ≤2 (0–10). 2011 Boolean: the same with PtGA ≤1. A 28-joint count may miss active joints, especially in the feet and ankles — it is preferable to include feet and ankles when evaluating remission. The index-based definitions (SDAI ≤3.3, CDAI ≤2.8) were endorsed alongside Boolean and are on the CDAI / SDAI page.',
+  'Studenic P, Aletaha D, de Wit M, et al. American College of Rheumatology/EULAR remission criteria for rheumatoid arthritis: 2022 revision. <i>Ann Rheum Dis.</i> 2023;82(1):74–80. Felson DT, Smolen JS, Wells G, et al. American College of Rheumatology/European League Against Rheumatism provisional definition of remission in rheumatoid arthritis for clinical trials. <i>Arthritis Rheum.</i> 2011;63(3):573–586.'
+));
+function boolCalc(){
+  const n = id => { const v = document.getElementById(id).value; return v==='' ? null : +v; };
+  const t = n('bool-tjc'), s = n('bool-sjc'), c = n('bool-crp'), p = n('bool-ptga');
+  const base = [[t,'TJC ≤1'],[s,'SJC ≤1'],[c,'CRP ≤1 mg/dL']].map(([v,l])=>({l, ok: v===null ? null : v<=1}));
+  const mk = lim => base.concat([{l:'PtGA ≤'+lim, ok: p===null ? null : p<=lim}]);
+  const b2 = mk(2), b1 = mk(1);
+  const met = b2.filter(x=>x.ok===true).length, any = b2.some(x=>x.ok!==null);
+  document.getElementById('bool-score').innerHTML = (any ? met : '–')+'<small>Items met for Boolean 2.0 (of 4)</small>';
+  document.getElementById('bool-detail').textContent = any ? b2.map(x=>(x.ok===true?'✓ ':x.ok===false?'✗ ':'– ')+x.l).join(' · ') : '';
+  const set = (id, name, list) => {
+    const el = document.getElementById(id);
+    if(!any){ el.className='pill neutral'; el.textContent=name+': enter values'; return; }
+    if(list.some(x=>x.ok===false)){ el.className='pill neutral'; el.textContent='Not in '+name+' remission'; return; }
+    if(list.some(x=>x.ok===null)){ el.className='pill neutral'; el.textContent=name+': enter all 4 items'; return; }
+    el.className='pill green'; el.textContent='In '+name+' remission';
+  };
+  set('bool-pill2','Boolean 2.0',b2);
+  set('bool-pill1','2011 Boolean',b1);
+}
+boolCalc();
+
+/* =========================================================
+   57. SPARCC MRI index (Maksymowych 2005) — sacroiliac joints 0–72, spine 0–108
+   SIJ: 6 consecutive coronal slices; per slice 8 quadrants + intensity (1/joint) + depth (1/joint) = 12.
+   Spine: 6 most affected DVUs; 3 consecutive sagittal slices; per slice 4 quadrants + intensity + depth = 6.
+   Intensity / depth can only score where bone marrow oedema is present, so they are capped by the BME value.
+========================================================= */
+const spaCell = (id,tag,max,label) => `<div class="spa-cell"><span class="spa-tag">${tag}</span><input type="range" id="${id}" class="spa-sl" min="0" max="${max}" step="1" value="0" aria-label="${label}" oninput="sparccCalc()"><span class="spa-val" id="${id}-v">0</span></div>`;
+const spaRow = (p,n,lab,bMax,xMax) => `<div class="spa-row"><b>${lab} ${n}</b>
+    ${spaCell(`sp-${p}-b${n}`,'BME',bMax,`${lab} ${n} bone marrow oedema`)}
+    ${spaCell(`sp-${p}-i${n}`,'Intensity',xMax,`${lab} ${n} intensity`)}
+    ${spaCell(`sp-${p}-d${n}`,'Depth',xMax,`${lab} ${n} depth`)}</div>`;
+const spa6 = [1,2,3,4,5,6];
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('sparcc','SPARCC MRI index',
+  'Spondyloarthritis Research Consortium of Canada MRI inflammation score on T2-weighted STIR sequences. Enter the totals for each slice (SIJ) or discovertebral unit (spine).','activity',
+  `<div class="toggle-row">
+     <div class="toggle-btn active" id="sparcc-btn-sij" onclick="sparccSetTab('sij')">Sacroiliac joints (0–72)</div>
+     <div class="toggle-btn" id="sparcc-btn-spine" onclick="sparccSetTab('spine')">Spine (0–108)</div>
+   </div>
+   <div id="sparcc-tab-sij">
+     <fieldset class="big-dom art"><legend>6 consecutive coronal slices<span class="dom-badge zero" id="sp-sij-badge">0 / 72</span></legend>
+       ${spa6.map(n=>spaRow('sij',n,'Slice',8,2)).join('')}
+     </fieldset>
+     <div class="hint" style="margin-top:8px;">Semicoronal slices through the cartilaginous part of the joint. <b>BME</b> 0–8: quadrants with increased STIR signal (upper/lower iliac, upper/lower sacral × 2 joints). <b>Intensity</b> 0–2: joints with a lesion as intense as the presacral veins. <b>Depth</b> 0–2: joints with homogeneous signal extending ≥1 cm from the articular surface. If more than 6 slices are available, use the 6 consecutive slices with the highest score; if fewer, score those available.</div>
+   </div>
+   <div id="sparcc-tab-spine" style="display:none;">
+     <fieldset class="big-dom art"><legend>6 most affected discovertebral units<span class="dom-badge zero" id="sp-spine-badge">0 / 108</span></legend>
+       ${spa6.map(n=>spaRow('spine',n,'DVU',12,3)).join('')}
+     </fieldset>
+     <div class="hint" style="margin-top:8px;">For each DVU, summed over the 3 most abnormal consecutive sagittal slices. <b>BME</b> 0–12: quadrants with increased STIR signal (upper/lower endplate × anterior/posterior, 4 per slice). <b>Intensity</b> 0–3: slices with signal as intense as CSF. <b>Depth</b> 0–3: slices with homogeneous signal extending ≥1 cm from the endplate surface. Reference normal signal = centre of the vertebra; do not score disc lesions; at follow-up, score the same levels as at baseline.</div>
+   </div>`,
+  `<div><div class="score" id="sparcc-score">0<small>SPARCC SIJ (0–72)</small></div></div><span class="pill neutral" id="sparcc-pill">Enter values</span>`,
+  'SIJ: each joint is divided into 4 quadrants scored 0/1 for bone marrow oedema (max 8 per slice), with +1 per joint for intensity and +1 per joint for depth (max 12 per slice), over 6 consecutive coronal slices = 0–72. Spine: of 23 discovertebral units, the 6 most severely affected are scored over 3 consecutive sagittal slices: 4 quadrants + intensity + depth = max 6 per slice, 18 per DVU, 0–108 overall. Intensity and depth are capped automatically by the BME value, since they can only score where oedema is present. This tool sums slice-level totals rather than recording individual quadrants; no validated severity bands are applied.',
+  'Maksymowych WP, Inman RD, Salonen D, et al. Spondyloarthritis Research Consortium of Canada magnetic resonance imaging index for assessment of sacroiliac joint inflammation in ankylosing spondylitis. <i>Arthritis Rheum.</i> 2005;53(5):703–709. Maksymowych WP, Inman RD, Salonen D, et al. Spondyloarthritis Research Consortium of Canada magnetic resonance imaging index for assessment of spinal inflammation in ankylosing spondylitis. <i>Arthritis Rheum.</i> 2005;53(4):502–509. SPARCC MRI spine scoring methodology (Maksymowych, Inman, Lambert, Salonen, Dhillon, Stone). Weiss PF, Maksymowych WP, Xiao R, et al. <i>Arthritis Res Ther.</i> 2020;22:58.'
+));
+window._sparccTab = 'sij';
+function sparccSetTab(tab){
+  window._sparccTab = tab;
+  ['sij','spine'].forEach(t=>{
+    document.getElementById('sparcc-btn-'+t).classList.toggle('active', t===tab);
+    document.getElementById('sparcc-tab-'+t).style.display = t===tab ? '' : 'none';
+  });
+  sparccCalc();
+}
+function sparccCalc(){
+  const sum = (p, capOf) => {
+    let b=0, i=0, d=0;
+    spa6.forEach(n=>{
+      const eb = document.getElementById(`sp-${p}-b${n}`), ei = document.getElementById(`sp-${p}-i${n}`), ed = document.getElementById(`sp-${p}-d${n}`);
+      const cap = capOf(+eb.value);
+      if(+ei.value>cap) ei.value = cap;
+      if(+ed.value>cap) ed.value = cap;
+      [eb,ei,ed].forEach(e=>{ document.getElementById(e.id+'-v').textContent = e.value; });
+      b += +eb.value; i += +ei.value; d += +ed.value;
+    });
+    return {b,i,d,total:b+i+d};
+  };
+  const sij = sum('sij', q=>Math.min(q,2)), spine = sum('spine', q=>Math.min(q,3));
+  const setB = (id,t,m)=>{ const el=document.getElementById(id); el.textContent=t+' / '+m; el.classList.toggle('zero',t===0); };
+  setB('sp-sij-badge',sij.total,72); setB('sp-spine-badge',spine.total,108);
+  const isSij = window._sparccTab==='sij', r = isSij ? sij : spine, max = isSij ? 72 : 108, name = isSij ? 'SPARCC SIJ' : 'SPARCC spine';
+  document.getElementById('sparcc-score').innerHTML = r.total+'<small>'+name+' (0–'+max+') · BME '+r.b+'/'+(isSij?48:72)+' · intensity '+r.i+'/'+(isSij?12:18)+' · depth '+r.d+'/'+(isSij?12:18)+'</small>';
+  const pill = document.getElementById('sparcc-pill');
+  pill.className = 'pill neutral';
+  pill.textContent = name+' = '+r.total+'/'+max;
+}
+sparccCalc();
+
+/* =========================================================
+   58. mSASSS (Creemers 2005) — anterior vertebral corners, lateral cervical + lumbar films
+   24 corners × 0–3 = 0–72 (cervical: lower C2 → upper T1; lumbar: lower T12 → upper S1)
+========================================================= */
+const MSASSS_C = ['C2','C3','C4','C5','C6','C7','T1'], MSASSS_L = ['T12','L1','L2','L3','L4','L5','S1'];
+const msSel = id => `<select id="${id}" onchange="msasssCalc()">${[0,1,2,3,'x'].map(v=>`<option value="${v}">${v}</option>`).join('')}</select>`;
+const msTable = (reg, list) => `<div style="overflow-x:auto;"><table class="cdasi-table" style="width:100%; border-collapse:collapse; font-size:12.5px;">
+    <thead><tr><th style="text-align:left; padding:5px 6px; border-bottom:2px solid var(--line);">Vertebra</th><th style="padding:5px 4px; border-bottom:2px solid var(--line);">Upper anterior corner</th><th style="padding:5px 4px; border-bottom:2px solid var(--line);">Lower anterior corner</th></tr></thead>
+    <tbody>${list.map((v,i)=>`<tr><td style="padding:4px 6px; border-bottom:1px solid var(--line);"><b>${v}</b></td>
+      <td${i===0?' class="ms-na"':''} style="padding:2px; border-bottom:1px solid var(--line); text-align:center;">${i===0?'<span class="hint">—</span>':msSel(`ms-${reg}-${v}-u`)}</td>
+      <td${i===list.length-1?' class="ms-na"':''} style="padding:2px; border-bottom:1px solid var(--line); text-align:center;">${i===list.length-1?'<span class="hint">—</span>':msSel(`ms-${reg}-${v}-l`)}</td></tr>`).join('')}</tbody>
+  </table></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('msasss','mSASSS',
+  'Modified Stoke Ankylosing Spondylitis Spine Score — radiographic damage at the anterior vertebral corners on lateral cervical and lumbar films. 24 corners, each 0–3.','activity',
+  `<fieldset class="big-dom art"><legend>Cervical spine (lower C2 → upper T1)<span class="dom-badge zero" id="ms-c-badge">0 / 36</span></legend>${msTable('c',MSASSS_C)}</fieldset>
+   <fieldset class="big-dom art"><legend>Lumbar spine (lower T12 → upper S1)<span class="dom-badge zero" id="ms-l-badge">0 / 36</span></legend>${msTable('l',MSASSS_L)}</fieldset>
+   <div class="hint" style="margin-top:8px;"><b>0</b> no abnormality · <b>1</b> erosion, sclerosis or squaring · <b>2</b> syndesmophyte (non-bridging) · <b>3</b> total bony bridging (ankylosis) · <b>x</b> site not clearly visible. C3 is not scored for squaring (erosion and sclerosis are). Changes unrelated to AS, such as osteophytes, are not scored.</div>`,
+  `<div><div class="score" id="ms-score">0<small>mSASSS (0–72)</small></div></div><span class="pill neutral" id="ms-pill">Enter values</span>`,
+  'mSASSS is the sum of the lumbar and cervical spine scores (range 0–72). Each anterior vertebral corner is scored 0–3 on lateral radiographs. Missing sites: a region counts only if no more than 3 of its 12 sites are missing, and its score (0–36) is then 12 × the mean of the scored sites. Higher = more structural damage; no validated severity bands are applied. Progression is usually reported as an increase &gt;0 (or &gt;0.5 when using the mean of two readers), or above the smallest detectable change; a 2-year interval is the established shortest follow-up.',
+  "Creemers MCW, Franssen MJAM, van 't Hof MA, et al. Assessment of outcome in ankylosing spondylitis: an extended radiographic scoring system. <i>Ann Rheum Dis.</i> 2005;64(1):127–129. van der Heijde D, Braun J, Deodhar A, et al. Modified stoke ankylosing spondylitis spinal score as an outcome measure to assess the impact of treatment on structural progression in ankylosing spondylitis. <i>Rheumatology (Oxford).</i> 2019;58(3):388–400."
+));
+function msasssCalc(){
+  /* Creemers 2005: a region counts only with ≤3 of its 12 sites missing; region score = 12 × mean of scored sites */
+  const region = reg => {
+    const vals = Array.from(document.querySelectorAll(`select[id^="ms-${reg}-"]`)).map(e=>e.value).filter(v=>v!=='x').map(Number);
+    const missing = 12 - vals.length, valid = missing<=3;
+    return {missing, valid, score: valid ? roundTo(12*vals.reduce((a,b)=>a+b,0)/vals.length, 2) : null};
+  };
+  const c = region('c'), l = region('l');
+  const label = r => r.valid ? fmtNum36(r.score)+' / 36' : 'not scorable';
+  const setB = (id,r)=>{ const el=document.getElementById(id); el.textContent=label(r); el.classList.toggle('zero',!r.score); };
+  setB('ms-c-badge',c); setB('ms-l-badge',l);
+  const miss = r => r.missing ? ' ('+r.missing+' missing)' : '';
+  const detail = 'cervical '+(c.valid?fmtNum36(c.score)+'/36':'not scorable')+miss(c)+' · lumbar '+(l.valid?fmtNum36(l.score)+'/36':'not scorable')+miss(l);
+  const pill = document.getElementById('ms-pill');
+  if(c.valid && l.valid){
+    const total = roundTo(c.score+l.score,2);
+    document.getElementById('ms-score').innerHTML = fmtNum36(total)+'<small>mSASSS (0–72) · '+detail+'</small>';
+    pill.className = 'pill neutral'; pill.textContent = 'mSASSS = '+fmtNum36(total)+'/72';
+  } else {
+    document.getElementById('ms-score').innerHTML = '–<small>mSASSS (0–72) · '+detail+'</small>';
+    pill.className = 'pill orange'; pill.textContent = 'Not scorable — more than 3 sites missing in a region';
+  }
+}
+function fmtNum36(n){ return Number.isInteger(n) ? String(n) : n.toFixed(2); }
+msasssCalc();
+
+/* =========================================================
+   59–61. SSc indices: SCTC-AI (Ross 2024, Table 2), SCTC-DI (Ferdowsi 2019, Table 2), EUSTAR-AI (Valentini 2017)
+   Add-on items: ticking one also counts its parent, unticking a parent clears its add-ons.
+========================================================= */
+const critRow = (id, fn, title, def, w, parent) => `<div class="crit-row${parent?' addon':''}"><div class="check-item"><input type="checkbox" id="${id}" data-w="${w}"${parent?` data-parent="${parent}"`:''} onchange="sscLink(this); ${fn}()"><label for="${id}"><b>${title}</b> <span class="w">(+${w})</span></label></div>${def?`<div class="acr97-def">${def}</div>`:''}</div>`;
+const sscDom = (title, rows) => `<fieldset class="big-dom ssc"><legend>${title}</legend>${rows}</fieldset>`;
+function sscLink(el){
+  if(el.checked && el.dataset.parent) document.getElementById(el.dataset.parent).checked = true;
+  if(!el.checked) el.closest('.panel').querySelectorAll(`[data-parent="${el.id}"]`).forEach(c=>{ c.checked = false; });
+}
+const SCTCAI = [
+  ['Skin',[
+    ['skin5','≥5-point increase in mRSS','Within the past 3 months',7],
+    ['skinnew','New areas of skin involvement','Thickening in any mRSS assessment area (irrespective of total mRSS) within the past 3 months',7],
+    ['skinpro','Patient-reported skin worsening','Only if previous mRSS is unavailable: skin worsened in the past month',1]]],
+  ['Vascular',[
+    ['du','Current, active digital tip ulcer','Loss of epithelialization of any degree of the epidermis, dermis and/or subcutaneous tissue, distal to or at the PIP joint of the hands or feet, not thought due to trauma',3],
+    ['dumulti','Multiple digital ulcers concurrently present','Extra score',1,'du'],
+    ['cdi','Critical digital ischemia','Acute onset (within 7 days) of persistent, painful discoloration of a digit with reduced capillary refill and cool temperature, due to SSc microvascular complications and not atherosclerosis or thromboembolism',9],
+    ['rppro','Patient-reported Raynaud worsening','Raynaud phenomenon worsened in the past month',1]]],
+  ['Musculoskeletal',[
+    ['syn','Current synovitis','',6],
+    ['tfr','Current tendon friction rub','',7],
+    ['myo','Myositis','Proximal weakness on examination with elevated CK and/or aldolase, and myositis on MRI, EMG or muscle biopsy, within the past 3 months',6]]],
+  ['Respiratory',[
+    ['fvc','Relative decrease of ≥5% in FVC','Within the past 6 months',8],
+    ['dlco','Relative decrease of ≥10% in DLCO','Within the past 6 months',7],
+    ['ildprog','≥10% increased extent of ILD on HRCT','Within the past 6 months',7],
+    ['ildnew','New diagnosis of ILD on HRCT','',4],
+    ['brpro','Patient-reported worsening of breathlessness','Only if previous PFT or HRCT results are unavailable: in the past month',4]]],
+  ['Pulmonary arterial hypertension',[
+    ['pah','New PAH','Detected for the first time by right heart catheterization, diagnosed within the past 3 months',3]]],
+  ['Renal',[
+    ['src','Active scleroderma renal crisis','Evidence of ongoing crisis: poorly controlled hypertension (no other etiology), rising serum creatinine and/or hemolysis on blood film at assessment',10]]],
+  ['Cardiac',[
+    ['sysd','Acute or subacute systolic dysfunction','New presentation of cardiac failure due to systolic dysfunction, not due to other causes, or cardiogenic shock',5],
+    ['myoc','Active myocarditis','Acute inflammation on endomyocardial biopsy or cardiac MRI, or new symptoms with new global/regional ventricular dysfunction on TTE not due to another cause, with elevated troponin',9],
+    ['peri','Acute pericarditis','Clinical history and examination with supportive EKG changes and/or imaging such as pericardial effusion, with or without elevated troponin',6],
+    ['trop','Elevated troponin','Above upper limit of normal',8],
+    ['bnp','Elevated BNP / NT-proBNP','Above upper limit of normal',8]]],
+  ['Gastrointestinal',[['gipro','Patient-reported GI worsening','SSc gastrointestinal symptoms worsened in the past month',1]]],
+  ['Laboratory',[['crp','Elevated CRP','Above upper limit of normal',6]]],
+  ['Constitutional',[['wt','Weight decrease of ≥10%','Within the past 6 months',6]]],
+];
+const SCTCDI = [
+  ['Musculoskeletal and skin',[
+    ['sjc','Small joint contracture*','Any degree of contracture, unable to reduce to the anatomically neutral position, in any small joint of the fingers',2],
+    ['ljc','Large joint contracture*','As above, in the large joints, specifically elbows and knees',2],
+    ['sicca','Sicca symptoms*','Dry eyes and/or dry mouth requiring daily treatment (e.g. lubricant eye drops, punctal plugs, saliva replacement)',3],
+    ['pmw','Proximal muscle weakness*','Shoulder abduction and/or hip or knee flexion less than 5/5 power on examination (not due to contracture or pain)',3],
+    ['calc','Calcinosis complicated by infection or requiring surgery','',4]]],
+  ['Vascular',[
+    ['du','Digital ulceration*','Loss of epithelialization of any degree, distal to or at the PIP joint of the hands or feet, not due to trauma and refractory to therapy',2],
+    ['amp','Digital amputation required','Surgical or auto-amputation (add-on)',1,'du']]],
+  ['Gastrointestinal',[
+    ['dys','Esophageal dysmotility','Distal dysphagia refractory to treatment, with stricture or malignancy excluded by endoscopy',1],
+    ['str','Esophageal stricture','Confirmed on testing such as endoscopy or barium swallow',1],
+    ['gerd','Refractory GERD*','Heartburn refractory to treatment (e.g. proton pump inhibitors) and confirmed on endoscopy',1],
+    ['gave','Gastric antral vascular ectasia','Confirmed on endoscopy',2],
+    ['pseudo','Pseudo-obstruction','Symptoms such as vomiting or constipation, with dilatation of the small and/or large bowel on imaging',3],
+    ['bmi','Low BMI or weight loss','BMI &lt;18.5 kg/m², OR weight loss &gt;10% in the last 12 months',2]]],
+  ['Respiratory',[
+    ['ild','Moderate to severe ILD','&gt;20% extent on HRCT of the chest',2],
+    ['fvc','FVC &lt;70%*','On lung function tests, not due to respiratory muscle weakness (add-on)',4,'ild'],
+    ['o2','Dependence on home oxygen','',5]]],
+  ['Cardiovascular',[
+    ['pah','Pulmonary arterial hypertension','mPAP &gt;25 mmHg at rest and PAWP &lt;15 mmHg on right heart catheterization',2],
+    ['rv','Moderate to severe RV dysfunction','On echocardiography, any measure of RV function assessed by an experienced cardiologist (add-on)',5,'pah'],
+    ['myo','Myocardial disease attributable to SSc','Clinical features AND supportive investigations (e.g. syncope from conduction abnormality, arrhythmia requiring defibrillator, heart block requiring pacemaker or ablation, systolic or diastolic dysfunction on TTE)',3],
+    ['peff','Moderate to large pericardial effusion*','Greater than 1 cm on transthoracic echocardiogram',1]]],
+  ['Renal',[
+    ['src','History of scleroderma renal crisis','Hypertensive or normotensive, per International Scleroderma Renal Crisis Study Investigators',3],
+    ['egfr','Persistent renal impairment, eGFR &lt;45','SRC or other SSc-related kidney disease with eGFR &lt;45 mL/min/1.73 m² (add-on)',1,'src'],
+    ['rrt','Stage 5 renal impairment needing RRT','SRC with need for renal replacement therapy (add-on)',2,'src']]],
+];
+const sscRows = (list, pre, fn) => list.map(([dom,items])=>sscDom(dom, items.map(([id,t,d,w,par])=>critRow(pre+id,fn,t,d,w,par?pre+par:'')).join(''))).join('');
+const sscIds = (list, pre) => list.flatMap(([,items])=>items.map(it=>pre+it[0]));
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('sctcai','SSc activity / damage indices',
+  'Scleroderma Clinical Trials Consortium Activity Index — disease activity defined as aspects of disease that are reversible, or can be arrested, with time and/or effective therapy. Weighted items, maximum 140.','activity',
+  sscRows(SCTCAI,'ai-','sctcaiCalc'),
+  `<div><div class="score" id="sctcai-score">0<small>SCTC-AI (0–140)</small></div></div><span class="pill neutral" id="sctcai-pill">Enter values</span>`,
+  'Items add up to a maximum of 140. Patient-reported skin and breathlessness items are used only when the previous mRSS or PFT/HRCT is unavailable. No cut-off for active disease has been published: the development paper used tertiles of baseline scores, so the result is reported as a continuous score.',
+  'Ross L, Hansen D, Proudman S, et al. Development and initial validation of the novel Scleroderma Clinical Trials Consortium Activity Index. <i>Arthritis Rheumatol.</i> 2024;76(11):1635–1644.'
+));
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('sctcdi','SSc activity / damage indices',
+  'Scleroderma Clinical Trials Consortium Damage Index — 23 weighted items across six organ systems, quantifying organ damage. Attribution to SSc is required for all items; * must be present for at least 6 months.','activity',
+  sscRows(SCTCDI,'di-','sctcdiCalc'),
+  `<div><div class="score" id="sctcdi-score">0<small>SCTC-DI (0–55)</small></div></div><span class="pill green" id="sctcdi-pill">No damage recorded</span>`,
+  'Maximum 55; the score can only rise over time. Add-on items also count their parent item (e.g. FVC &lt;70% adds 4 to the 2 points for ILD). Risk groups in the development paper: low &lt;5, moderate 6–12, high ≥13 (a score of exactly 5 is not assigned in the paper; it is shown here as low).',
+  'Ferdowsi N, Huq M, Stevens W, et al. Development and validation of the Scleroderma Clinical Trials Consortium Damage Index (SCTC-DI): a novel instrument to quantify organ damage in systemic sclerosis. <i>Ann Rheum Dis.</i> 2019;78(6):807–816.'
+));
+const EUSTAR = [
+  ['dskin','Δ-skin','Patient-assessed worsening of the skin during the previous month',1.5],
+  ['mrss','mRSS &gt;18','',1.5],
+  ['du','Digital ulcers','',1.5],
+  ['tfr','Tendon friction rubs','',2.25],
+  ['crp','CRP &gt;1 mg/dL','',2.25],
+  ['dlco','DLCO &lt;70% predicted','',1.0],
+];
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('eustarai','SSc activity / damage indices',
+  'Revised EUSTAR activity index for systemic sclerosis — weighted 10-point index; ≥2.5 identifies active disease.','activity',
+  sscDom('Items', EUSTAR.map(([id,t,d,w])=>critRow('eu-'+id,'eustarCalc',t,d,w,'')).join('')),
+  `<div><div class="score" id="eustar-score">0.00<small>EUSTAR-AI (0–10)</small></div></div><span class="pill neutral" id="eustar-pill">Not active (&lt;2.5)</span>`,
+  'Sum of the weighted items (0–10). A cut-off of ≥2.5 best separated active / very active from inactive / moderately active disease in the derivation study.',
+  'Valentini G, Iudici M, Walker UA, et al. The European Scleroderma Trials and Research group (EUSTAR) task force for the development of revised activity criteria for systemic sclerosis: derivation and validation of a preliminarily revised EUSTAR activity index. <i>Ann Rheum Dis.</i> 2017;76(1):270–276.'
+));
+function sctcaiCalc(){
+  const t = sumChecks(sscIds(SCTCAI,'ai-'));
+  document.getElementById('sctcai-score').innerHTML = t+'<small>SCTC-AI (0–140)</small>';
+  document.getElementById('sctcai-pill').textContent = 'SCTC-AI = '+t+'/140';
+}
+function sctcdiCalc(){
+  const t = sumChecks(sscIds(SCTCDI,'di-'));
+  document.getElementById('sctcdi-score').innerHTML = t+'<small>SCTC-DI (0–55)</small>';
+  const p = document.getElementById('sctcdi-pill');
+  p.className = 'pill '+(t===0?'green':t<=5?'yellow':t<=12?'orange':'red');
+  p.textContent = t===0 ? 'No damage recorded' : 'SCTC-DI '+t+'/55 — '+(t<=5?'low':t<=12?'moderate':'high')+' damage group';
+}
+function eustarCalc(){
+  const t = roundTo(sumChecks(EUSTAR.map(e=>'eu-'+e[0])),2);
+  document.getElementById('eustar-score').innerHTML = fmt(t,2)+'<small>EUSTAR-AI (0–10)</small>';
+  const p = document.getElementById('eustar-pill');
+  p.className = 'pill '+(t>=2.5?'red':'neutral');
+  p.textContent = t>=2.5 ? 'Active disease (≥2.5)' : 'Not active (<2.5)';
+}
+sctcaiCalc(); sctcdiCalc(); eustarCalc();
+
+/* =========================================================
+   DETECT — two-step PAH screening in SSc (Coghlan 2014).
+   Points follow Table 2 (logistic coefficients, restricted cubic
+   splines) on the scale of the Figure 3 nomograms; the scale
+   constants below were measured from that figure.
+========================================================= */
+const DET_PTS1 = 12.432;   /* Step 1 risk points per logit */
+const detSpline = (x,t1,t2,t3)=>{
+  const c = v=>Math.pow(Math.max(v,0),3);
+  return (c(x-t1) - c(x-t2)*(t3-t1)/(t3-t2) + c(x-t3)*(t2-t1)/(t3-t2)) / Math.pow(t3-t1,2);
+};
+const detField = (id,label,attrs)=>`<div class="field"><label>${label}</label><input type="number" id="${id}" min="0" ${attrs} oninput="detectCalc()"><div class="hint" id="${id}-pts"></div></div>`;
+const detSelect = (id,label,yesPts)=>`<div class="field"><label>${label}</label><select id="${id}" onchange="detectCalc()"><option value="">Not entered</option><option value="0">No (50 pts)</option><option value="1">Yes (${yesPts} pts)</option></select></div>`;
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('detect','DETECT (SSc-PAH screening)',
+  'Two-step algorithm for detecting pulmonary arterial hypertension in systemic sclerosis: Step 1 decides referral to echocardiography, Step 2 decides referral to right heart catheterisation.','activity',
+  `<div class="check-item" style="background:var(--yellow-bg); padding:8px; border-radius:8px;"><input type="checkbox" id="det-entry" onchange="detectCalc()"><label for="det-entry">Entry (study population): SSc with disease duration &gt;3 years from the first non-Raynaud's symptom</label></div>
+   <fieldset class="big-dom ssc" data-no-sum="1"><legend>Step 1 — non-echocardiographic<span class="dom-badge zero" id="det-s1-badge">– pts</span></legend>
+     <div class="grid">
+       ${detField('det-fvc','FVC (% predicted)','step="1"')}
+       ${detField('det-dlco','DLCO (% predicted)','step="1"')}
+       ${detField('det-bnp','NT-proBNP (pg/mL)','step="1"')}
+       ${detField('det-urate','Serum urate (mg/dL)','step="0.1"')}
+     </div>
+     <div class="grid" style="margin-top:10px;">
+       ${detSelect('det-tel','Current / past telangiectasias','64.4')}
+       ${detSelect('det-aca','Anticentromere antibody','59.4')}
+       ${detSelect('det-rad','ECG right axis deviation (QRS axis ≥90°)','73')}
+     </div>
+   </fieldset>
+   <fieldset class="big-dom ssc" data-no-sum="1"><legend>Step 2 — echocardiographic<span class="dom-badge zero" id="det-s2-badge">– pts</span></legend>
+     <div class="grid">
+       ${detField('det-ra','Right atrium area (cm²)','step="0.1"')}
+       ${detField('det-tr','TR velocity (m/s) <span class="hint">leave blank if no TR jet</span>','step="0.1"')}
+     </div>
+   </fieldset>`,
+  `<div style="display:flex; gap:24px; flex-wrap:wrap;">
+     <div><div class="score" id="det-s1-score">–<small>Step 1 (cut-off &gt;300)</small></div></div>
+     <div><div class="score" id="det-s2-score">–<small>Step 2 (cut-off &gt;35)</small></div></div>
+   </div>
+   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+     <span class="pill neutral" id="det-pill">Enter values</span>
+     <span class="pill orange" id="det-pop" style="display:none;"></span>
+   </div>`,
+  'Designed for high-risk patients: SSc for &gt;3 years with DLCO &lt;60% predicted. Every variable contributes points whatever its value, so a negative ACA still adds 50. One missing variable out of the eight is allowed: a Step 1 variable is assigned 50 points (telangiectasias 65) and a Step 2 variable 10 points; with more than one missing the nomograms cannot be used reliably. A less conservative Step 2 cut-off of &gt;40 was also published (65% specificity instead of 35%). An absent TR jet was not scored as 0 in the model: it was imputed as the mean of the available values ≤2.8 m/s (supplement, appendix 8), so leave TR blank if no jet is detectable (10 points, equivalent to about 2.5 m/s). Points are computed from the published coefficients on the Figure 3 scale, which agrees with the printed axes to about 0.1–0.2 point. The cut-offs of 300 and 35 appear to be rounded: against the patients listed in supplement table S6 the exact model cut-offs fall slightly lower, so treat a total within about 2 points below a cut-off as borderline.',
+  'Coghlan JG, Denton CP, Grünig E, et al. Evidence-based detection of pulmonary arterial hypertension in systemic sclerosis: the DETECT study. <i>Ann Rheum Dis.</i> 2014;73(7):1340–1349.'
+));
+function detectCalc(){
+  const $ = id=>document.getElementById(id);
+  const num = id=>$(id).value==='' ? null : +$(id).value;
+  const clampTo = (v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+  const note = (id,v,lo,hi,pts)=>{ $(id+'-pts').textContent = v===null ? '' : pts.toFixed(1)+' pts'+(v<lo||v>hi ? ' (end of nomogram scale used)' : ''); };
+  let missing1 = 0;
+  const miss1 = v=>{ missing1++; return v; };
+
+  const fvc = num('det-fvc'), dlco = num('det-dlco');
+  const ratio = fvc!==null && dlco ? fvc/dlco : null;
+  const ratioPts = ratio===null ? miss1(50) : 50 + 1.149*DET_PTS1*(clampTo(ratio,0,5)-1.5);
+  $('det-fvc-pts').textContent = '';
+  $('det-dlco-pts').textContent = ratio===null ? '' : 'FVC/DLCO '+ratio.toFixed(2)+' → '+ratioPts.toFixed(1)+' pts'+(ratio>5 ? ' (end of nomogram scale used)' : '');
+
+  const bnp = num('det-bnp');
+  const bnpPts = bnp===null ? miss1(50) : 50 + 0.915*DET_PTS1*(Math.log10(clampTo(bnp,1,10000))-2);
+  note('det-bnp',bnp,1,10000,bnpPts);
+
+  const urate = num('det-urate');
+  let uratePts;
+  if(urate===null) uratePts = miss1(50);
+  else { const u = clampTo(urate,2,10); uratePts = -18.385 + DET_PTS1*(1.247*u - 1.132*detSpline(u,3.3,4.7,7.1)); }
+  note('det-urate',urate,2,10,uratePts);
+
+  const binary = (id,beta,missingPts)=>$(id).value==='' ? miss1(missingPts) : 50 + (+$(id).value)*beta*DET_PTS1;
+  const telPts = binary('det-tel',1.156,65), acaPts = binary('det-aca',0.753,50), radPts = binary('det-rad',1.850,50);
+
+  const ra = num('det-ra'), tr = num('det-tr');
+  const raPts = ra===null ? 10 : 10 + 0.3672*(clampTo(ra,0,40)-15);
+  let trPts = 10;
+  if(tr!==null){ const v = clampTo(tr,0,5); trPts = 6.75 + 5.02*(0.209*v + 2.656*detSpline(v,2,2.5,3.4)); }
+  note('det-ra',ra,0,40,raPts);
+  note('det-tr',tr,0,5,trPts);
+  const missing2 = (ra===null?1:0) + (tr===null?1:0);
+
+  const s1Label = '<small>Step 1 (cut-off &gt;300)</small>', s2Label = '<small>Step 2 (cut-off &gt;35)</small>';
+  const pill = $('det-pill'), pop = $('det-pop');
+  const setPill = (level,text)=>{ pill.className = 'pill '+pillClass(level); pill.textContent = text; };
+  const badge = (id,v)=>{ $(id).textContent = v===null ? '– pts' : v.toFixed(1)+' pts'; $(id).classList.toggle('zero', v===null); };
+  $('det-s2-score').innerHTML = '–'+s2Label;
+  badge('det-s2-badge',null);
+
+  if(missing1>1){
+    $('det-s1-score').innerHTML = '–'+s1Label;
+    badge('det-s1-badge',null);
+    setPill('neutral','Enter values ('+missing1+' of 6 Step 1 variables missing; at most 1 allowed)');
+    pop.style.display = 'none';
+    return;
+  }
+  const s1 = roundTo(ratioPts+telPts+acaPts+bnpPts+uratePts+radPts, 1);
+  $('det-s1-score').innerHTML = fmt(s1,1)+s1Label;
+  badge('det-s1-badge',s1);
+
+  const outside = [];
+  if(!$('det-entry').checked) outside.push('SSc >3 years not confirmed');
+  if(dlco!==null && dlco>=60) outside.push('DLCO ≥60%');
+  pop.style.display = outside.length ? '' : 'none';
+  pop.textContent = 'Outside the DETECT population: '+outside.join(', ');
+
+  if(s1<=300){ setPill('green','Step 1 ≤300: no referral to echocardiography'); return; }
+  if(missing1+missing2>1){ setPill('moderate','Step 1 >300: refer to echocardiography, then enter Step 2'); return; }
+  const s1Scaled = 10 + (clampTo(s1,300,440)-300)*50/140;
+  const s2 = roundTo(s1Scaled+raPts+trPts, 1);
+  $('det-s2-score').innerHTML = fmt(s2,1)+s2Label;
+  badge('det-s2-badge',s2);
+  if(s2>35) setPill('high','Step 2 >35: refer to right heart catheterisation');
+  else setPill('green','Step 2 ≤35: no referral to right heart catheterisation');
+}
+detectCalc();
 
 /* =========================================================
    36. 2002 AECG Sjögren Criteria
@@ -4761,7 +5282,7 @@ appendRefTable('acreular2010', `
     <tr><td>&gt;10 joints (≥1 small joint)</td><td>5</td></tr>
     <tr><td rowspan="3">B. Serology</td><td>Negative RF and negative ACPA</td><td>0</td></tr>
     <tr><td>Low-positive RF or low-positive ACPA</td><td>2</td></tr>
-    <tr><td>High-positive RF or high-positive ACPA</td><td>3</td></tr>
+    <tr><td>High-positive RF or high-positive ACPA (≥3× ULN)</td><td>3</td></tr>
     <tr><td rowspan="2">C. Acute-phase reactants</td><td>Normal CRP and normal ESR</td><td>0</td></tr>
     <tr><td>Abnormal CRP or abnormal ESR</td><td>1</td></tr>
     <tr><td rowspan="2">D. Duration of symptoms</td><td>&lt;6 weeks</td><td>0</td></tr>
@@ -4785,14 +5306,15 @@ appendRefTable('basdai', `
 
 appendRefTable('asdas', `
   <div class="formula-box">ASDAS-CRP = 0.121·(back pain) + 0.058·(morning stiffness duration) + 0.110·(patient global) + 0.073·(peripheral pain/swelling) + 0.579·ln(CRP+1)</div>
-  <p class="hint">All clinical items 0–10 VAS; CRP in the formula is in mg/L (= mg/dL × 10) — if CRP &lt;2 mg/L (0.2 mg/dL) or below the detection limit, use 2 mg/L (Machado 2015). Lukas C, Landewé R, Sieper J, et al. Development of an ASAS-endorsed disease activity score (ASDAS). <i>Ann Rheum Dis.</i> 2009;68(1):18–24.</p>`);
+  <div class="formula-box">ASDAS-ESR = 0.079·(back pain) + 0.069·(morning stiffness duration) + 0.113·(patient global) + 0.086·(peripheral pain/swelling) + 0.293·√ESR</div>
+  <p class="hint">All clinical items 0–10 VAS; ESR in mm/h; CRP in the formula is in mg/L (= mg/dL × 10) — if CRP &lt;2 mg/L (0.2 mg/dL) or below the detection limit, use 2 mg/L (Machado 2015). Lukas C, Landewé R, Sieper J, et al. Development of an ASAS-endorsed disease activity score (ASDAS). <i>Ann Rheum Dis.</i> 2009;68(1):18–24.</p>`);
 
 appendRefTable('sledai', `
   <table><caption>SLEDAI-2K descriptors &amp; weights (score present within, or in the 10 days prior to, assessment)</caption>
   <thead><tr><th>Weight</th><th>Descriptors</th></tr></thead>
   <tbody>
     <tr><td>8</td><td>Seizure, Psychosis, Organic brain syndrome, Visual disturbance, Cranial nerve disorder, Lupus headache, CVA, Vasculitis</td></tr>
-    <tr><td>4</td><td>Arthritis, Myositis, Urinary casts, Hematuria, Proteinuria, Pyuria</td></tr>
+    <tr><td>4</td><td>Arthritis, Myositis, Urinary casts (heme-granular or RBC casts), Hematuria, Proteinuria, Pyuria</td></tr>
     <tr><td>2</td><td>New rash, Alopecia, Mucosal ulcers, Pleurisy, Pericarditis, Low complement, Increased DNA binding</td></tr>
     <tr><td>1</td><td>Fever, Thrombocytopenia, Leukopenia</td></tr>
   </tbody></table>
@@ -5072,9 +5594,9 @@ appendRefTable('easybilag', `
     <tr><td>Biopsy-proven active nephritis (≤3 months)</td><td>1000</td></tr>
     <tr><td>Active urinary sediment</td><td>1000</td></tr>
     <tr><td>Nephrotic syndrome</td><td>100</td></tr>
-    <tr><td>Proteinuria &gt;100mg/mmol unimproved</td><td>1000</td></tr>
-    <tr><td>Proteinuria 50–100mg/mmol unimproved</td><td>10</td></tr>
-    <tr><td>Proteinuria &gt;25mg/mmol (mild/stable)</td><td>1</td></tr>
+    <tr><td>UPCR &gt;884 mg/g (&gt;100 mg/mmol) unimproved</td><td>1000</td></tr>
+    <tr><td>UPCR 442–884 mg/g (50–100 mg/mmol) unimproved</td><td>10</td></tr>
+    <tr><td>UPCR &gt;221 mg/g (&gt;25 mg/mmol) (mild/stable)</td><td>1</td></tr>
     <tr><td>GFR criteria (see calculator)</td><td>100</td></tr>
     <tr><td>Creatinine &gt;130 &amp; &gt;130% previous</td><td>100</td></tr>
     <tr><td>Creatinine &gt;130 &amp; 115–130% previous</td><td>10</td></tr>
@@ -5367,13 +5889,111 @@ appendRefTable('iim2017', `
 appendRefTable('cdasi', `
   <p class="hint">Verified structure only (see panel note above for what could not be independently confirmed): Activity = 3 components (erythema, scale, ulceration/erosion) across 15 anatomic sites, plus separately-scored hands, periungual change, and alopecia, totaling 0–100. Damage = poikiloderma + calcinosis only, 0–32. Total combined 0–132. Yassaee M, Fiorentino D, Okawa J, et al. <i>Br J Dermatol.</i> 2010;163(6):1179–1183.</p>`);
 
-appendRefTable('mmt8', `
-  <table><caption>MMT8 muscle groups</caption>
+appendRefTable('boolean', `
+  <table><caption>ACR/EULAR Boolean-based definitions of remission</caption>
+  <thead><tr><th>Item</th><th>2011 (Felson)</th><th>2022 Boolean 2.0 (Studenic)</th></tr></thead>
   <tbody>
-    <tr><td>Neck flexors</td><td>Deltoids</td><td>Biceps</td><td>Wrist extensors</td></tr>
-    <tr><td>Gluteus medius</td><td>Gluteus maximus</td><td>Quadriceps</td><td>Ankle dorsiflexors</td></tr>
+    <tr><td>Tender joint count</td><td>≤1</td><td>≤1</td></tr>
+    <tr><td>Swollen joint count</td><td>≤1</td><td>≤1</td></tr>
+    <tr><td>CRP</td><td>≤1 mg/dL</td><td>≤1 mg/dL</td></tr>
+    <tr><td>Patient global assessment (0–10)</td><td>≤1</td><td>≤2</td></tr>
   </tbody></table>
-  <p class="hint">Each 0 (no contraction) – 10 (normal), tested unilaterally (right side unless untestable). Total 0–80; lower = weaker. Rider LG, Koziol D, Giannini EH, et al. <i>Arthritis Care Res (Hoboken).</i> 2010;62(4):465–472.</p>`);
+  <p class="hint">Index-based alternatives: SDAI ≤3.3 or CDAI ≤2.8. Felson DT, et al. <i>Arthritis Rheum.</i> 2011;63(3):573–586. Studenic P, et al. <i>Ann Rheum Dis.</i> 2023;82(1):74–80.</p>`);
+
+appendRefTable('sparcc', `
+  <table><caption>SPARCC MRI index — maximum scores</caption>
+  <thead><tr><th>Region</th><th>Unit scored</th><th>Per unit</th><th>Total</th></tr></thead>
+  <tbody>
+    <tr><td>Sacroiliac joints</td><td>6 consecutive coronal slices</td><td>8 quadrants + 2 intensity + 2 depth = 12</td><td>72</td></tr>
+    <tr><td>Spine</td><td>6 most affected DVUs × 3 sagittal slices</td><td>(4 quadrants + intensity + depth) × 3 = 18</td><td>108</td></tr>
+  </tbody></table>
+  <p class="hint">Maksymowych WP, et al. <i>Arthritis Rheum.</i> 2005;53(5):703–709 (SIJ); 2005;53(4):502–509 (spine).</p>`);
+
+appendRefTable('msasss', `
+  <table><caption>mSASSS — anterior vertebral corners (24 sites, 0–3 each)</caption>
+  <thead><tr><th>Score</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>No abnormality</td></tr>
+    <tr><td>1</td><td>Erosion, sclerosis or squaring</td></tr>
+    <tr><td>2</td><td>Syndesmophyte (non-bridging)</td></tr>
+    <tr><td>3</td><td>Total bony bridging (ankylosis)</td></tr>
+  </tbody></table>
+  <p class="hint">Sum of cervical and lumbar spine scores, 0–72. Missing sites: ≤3 per region, region score = 12 × mean of scored sites. Creemers MCW, et al. <i>Ann Rheum Dis.</i> 2005;64(1):127–129.</p>`);
+
+appendRefTable('sctcai', `
+  <table><caption>SCTC-AI — weighted items (Table 2, Ross 2024)</caption>
+  <thead><tr><th>Domain</th><th>Item</th><th>Score</th></tr></thead>
+  <tbody>${SCTCAI.flatMap(([dom,items])=>items.map(it=>`<tr><td>${dom}</td><td>${it[1]}</td><td>${it[3]}</td></tr>`)).join('')}
+  <tr><td colspan="2"><b>Maximum</b></td><td><b>140</b></td></tr></tbody></table>`);
+
+appendRefTable('sctcdi', `
+  <table><caption>SCTC-DI — weighted items (Table 2, Ferdowsi 2019)</caption>
+  <thead><tr><th>Domain</th><th>Item</th><th>Score</th></tr></thead>
+  <tbody>${SCTCDI.flatMap(([dom,items])=>items.map(it=>`<tr><td>${dom}</td><td>${it[1]}</td><td>${it[4]?'add ':''}${it[3]}</td></tr>`)).join('')}
+  <tr><td colspan="2"><b>Maximum</b></td><td><b>55</b></td></tr></tbody></table>`);
+
+appendRefTable('eustarai', `
+  <table><caption>Revised EUSTAR activity index (Valentini 2017)</caption>
+  <thead><tr><th>Item</th><th>Weight</th></tr></thead>
+  <tbody>${EUSTAR.map(e=>`<tr><td>${e[1]}</td><td>${e[3]}</td></tr>`).join('')}<tr><td><b>Maximum</b> (active ≥2.5)</td><td><b>10</b></td></tr></tbody></table>`);
+
+appendRefTable('detect', `
+  <table><caption>DETECT Step 1 — risk points from the Figure 3 nomogram</caption>
+  <thead><tr><th>Variable</th><th>Scale</th><th>Coefficient (Table 2)</th></tr></thead>
+  <tbody>
+    <tr><td>FVC % predicted / DLCO % predicted</td><td>ratio 0 → 28.6, 1.5 → 50, 5 → 100</td><td>1.149</td></tr>
+    <tr><td>Current / past telangiectasias</td><td>No 50, Yes 64.4</td><td>1.156</td></tr>
+    <tr><td>Serum ACA</td><td>Negative 50, Positive 59.4</td><td>0.753</td></tr>
+    <tr><td>Serum NT-proBNP (log10, pg/mL)</td><td>100 → 50, 10000 → 72.8</td><td>0.915</td></tr>
+    <tr><td>Serum urate (mg/dL), spline knots 3.3, 4.7, 7.1</td><td>2 → 12.6, 4.5 → 49.7, 10 → 59.4</td><td>1.247; spline −1.132</td></tr>
+    <tr><td>ECG right axis deviation</td><td>No 50, Yes 73</td><td>1.850</td></tr>
+  </tbody></table>
+  <table><caption>DETECT Step 2 — risk points from the Figure 3 nomogram</caption>
+  <thead><tr><th>Variable</th><th>Scale</th><th>Coefficient (Table 2)</th></tr></thead>
+  <tbody>
+    <tr><td>Total risk points from Step 1</td><td>300 → 10, 440 → 60</td><td>0.891</td></tr>
+    <tr><td>Right atrium area (cm²)</td><td>0 → 4.5, 15 → 10, 40 → 19.2</td><td>0.075</td></tr>
+    <tr><td>TR velocity (m/s), spline knots 2, 2.5, 3.4</td><td>0 → 6.75, 2.5 → 10.2, 5 → 45.7</td><td>0.209; spline 2.656</td></tr>
+  </tbody></table>
+  <div class="formula-box">FVC/DLCO = 50 + 14.284·(ratio − 1.5) · NT-proBNP = 50 + 11.375·(log10 NT-proBNP − 2) · Urate = −18.385 + 12.432·[1.247·u − 1.132·S(u; 3.3, 4.7, 7.1)]</div>
+  <div class="formula-box">Step 2 = [10 + (Step 1 − 300)·50/140] + [10 + 0.3672·(RA area − 15)] + [6.75 + 5.02·(0.209·v + 2.656·S(v; 2, 2.5, 3.4))]</div>
+  <div class="formula-box">S(x; t1, t2, t3) = [(x−t1)³₊ − (x−t2)³₊·(t3−t1)/(t3−t2) + (x−t3)³₊·(t2−t1)/(t3−t2)] / (t3−t1)²</div>
+  <p class="hint">The paper and its supplement publish the coefficients and the nomograms, not per-item point formulas; the formulas above were derived from table 2 and calibrated to figure 3. Step 1 &gt;300 → echocardiography. Step 2 &gt;35 → right heart catheterisation (&gt;40 is the less conservative option). Coghlan JG, et al. <i>Ann Rheum Dis.</i> 2014;73(7):1340–1349, table 2, figure 3 and online supplement.</p>`);
+
+appendRefTable('mmt8', `
+  <table><caption>MMT8 scoring key — Right / Left / Axial (each 0–10)</caption>
+  <thead><tr><th>Muscle group</th><th>Right</th><th>Left</th><th>Axial</th></tr></thead>
+  <tbody>
+    <tr><td colspan="4"><b>Axial (0–10)</b></td></tr>
+    <tr><td>Neck flexors</td><td>×</td><td>×</td><td>0–10</td></tr>
+    <tr><td colspan="4"><b>Proximal (0–100)</b></td></tr>
+    <tr><td>Deltoid</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td>Biceps</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td>Gluteus maximus</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td>Gluteus medius</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td>Quadriceps</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td colspan="4"><b>Distal (0–40)</b></td></tr>
+    <tr><td>Wrist extensors</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td>Ankle dorsiflexors</td><td>0–10</td><td>0–10</td><td>×</td></tr>
+    <tr><td><b>MMT8 score (0–150)</b></td><td>0–70</td><td>0–70</td><td>0–10</td></tr>
+  </tbody></table>
+  <table><caption>Kendall 0–10 grades and MRC equivalents</caption>
+  <thead><tr><th>0–10</th><th>MRC</th><th>Function of the muscle</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>No contraction felt</td></tr>
+    <tr><td>T</td><td>1</td><td>Tendon prominent / feeble contraction, no visible movement</td></tr>
+    <tr><td>1</td><td>2−</td><td>Horizontal plane — partial range of motion</td></tr>
+    <tr><td>2</td><td>2</td><td>Horizontal plane — complete range of motion</td></tr>
+    <tr><td>3</td><td>2+</td><td>Anti-gravity position — partial range of motion</td></tr>
+    <tr><td>4</td><td>3−</td><td>Gradual release from test position</td></tr>
+    <tr><td>5</td><td>3</td><td>Holds test position (no added pressure)</td></tr>
+    <tr><td>6</td><td>3+</td><td>Holds against slight pressure</td></tr>
+    <tr><td>7</td><td>4−</td><td>Holds against slight to moderate pressure</td></tr>
+    <tr><td>8</td><td>4</td><td>Holds against moderate pressure</td></tr>
+    <tr><td>9</td><td>4+</td><td>Holds against moderate to strong pressure</td></tr>
+    <tr><td>10</td><td>5</td><td>Holds against strong pressure</td></tr>
+  </tbody></table>
+  <p class="hint">Unilateral MMT8 = right side (left if the right cannot be tested) + neck flexors, 0–80; bilateral = 0–150. Manual Muscle Testing Procedures for MMT8 Testing (IMACS, 2007). Rider LG, et al. <i>Arthritis Care Res (Hoboken).</i> 2010;62(4):465–472.</p>`);
 
 appendRefTable('sjogren2002', `
   <table><caption>AECG 2002 — 6 items</caption>
@@ -5695,7 +6315,7 @@ const UX = (function(){
     pan1990:      ['Applicability requirement', 'For use in a patient in whom a vasculitis diagnosis has already been established.'],
   };
   const RX_ENTRY_LABEL = /entry|absolute requirement|mandatory|required to apply|sufficient criterion/i;
-  const DOM_TITLE_PANELS = ['sle2019','slicc2012','acr1997','aps2023','assd2025','lnpath','essdai','bvas','mrss','pmr2012','gout2015','mctd'];   /* larger domain titles */
+  const DOM_TITLE_PANELS = ['sle2019','slicc2012','acr1997','sctcai','sctcdi','eustarai','detect','aps2023','assd2025','lnpath','essdai','bvas','mrss','pmr2012','gout2015','mctd'];   /* larger domain titles */
   const NO_GRID_PANELS = ['caspar','cress','ffs'];                                             /* one multi-select item per row */
 
   /* ---------- option-text parsing ---------- */
@@ -5893,7 +6513,7 @@ const UX = (function(){
     });
     /* one domain = one fieldset of point-bearing items (sum, or highest-only) */
     $$('fieldset', panel).forEach(fs=>{
-      const lg = fs.querySelector(':scope > legend'); if(!lg) return;
+      const lg = fs.querySelector(':scope > legend'); if(!lg || fs.hasAttribute('data-no-sum')) return;
       const items = pointItems(fs); if(!items.length) return;
       const isMax = items.some(it=>FIELDSET_MAX.has(it.id));
       addBadge(lg, ()=>{ const v = items.map(it=>it.val()||0); return isMax ? Math.max(0,...v) : v.reduce((a,b)=>a+b,0); });
@@ -6075,6 +6695,211 @@ const RESET = (function(){
   return {reset};
 })();
 
+/* =========================================================
+   PLAIN-TEXT OUTPUT — one copyable line under each result:
+   "<calculator>: total score N, <verdict>, item (+n), item (+n)".
+   Read-only: it reads the visible result box and the native
+   controls, and never feeds anything back into the scoring.
+========================================================= */
+const COPYTXT = (function(){
+  const clean = s => String(s||'').replace(/\s+/g,' ').trim();
+  const visible = el => !!(el && el.getClientRects().length);
+  const GROUP_LABEL = {};
+  CALC_GROUPS.forEach(g=>g.members.forEach(([id,label])=>{ GROUP_LABEL[id] = {label, own:['g-sscact','g-t2t'].includes(g.id)}; }));
+  /* score labels that carry the mode or instrument, so "total score" alone would lose information */
+  const NAMED_SCORE = new Set(['das28','cdai','sparcc','iim2017','pmr2012','sledai','eustarai','asdas','detect']);
+  const NO_DOMAIN_PREFIX = new Set(['sle2019']);   /* option text is self-explanatory: "Fever (+2)" */
+  /* items scored at domain level, not written in the checkbox label; first ticked item of a capped set carries the points */
+  const GROUP_PTS = [
+    [['ssc-pah','ssc-ild'],2], [['ssc-aca','ssc-scl70','ssc-rnap3'],3],
+    [['gout-ery'],1], [['gout-touch'],1], [['gout-walk'],1], [['gout-tophus'],4], [['assd-joint'],1],
+  ];
+  function shorten(name){
+    if(name.length<=60) return name;
+    let s = name, prev;
+    do { prev = s; s = s.replace(/\s*\([^()]*\)/g,''); } while(s!==prev);
+    s = clean(s.replace(/\s+([,:])/g,'$1'));
+    if(s.length>60) s = s.split(' — ')[0];
+    if(s.length>60 && !/^(sufficient|absolute|entry|mandatory)/i.test(s)) s = s.split(': ')[0];
+    return s;
+  }
+  function groupPts(cb){
+    const g = GROUP_PTS.find(([ids])=>ids.includes(cb.id));
+    if(!g) return 0;
+    return g[0].find(id=>document.getElementById(id).checked)===cb.id ? g[1] : 0;
+  }
+
+  function calcName(c){
+    const g = GROUP_LABEL[c.id];
+    if(!g) return c.name;
+    return g.own ? g.label : c.name+' ('+g.label+')';
+  }
+  function pts(n){ return n>0 ? '(+'+(Math.round(n*100)/100)+')' : '(-'+(Math.round(-n*100)/100)+')'; }
+  function withPts(name, n){ return n ? name+' '+pts(n) : name; }
+  function stripped(el, remove){
+    const c = el.cloneNode(true);
+    c.querySelectorAll(remove).forEach(x=>x.remove());
+    return clean(c.textContent);
+  }
+  function fieldLabel(el){
+    const f = el.closest('.field');
+    const l = f && f.querySelector(':scope > label');
+    if(!l) return '';
+    return stripped(l,'.dom-badge,.hint,small,.pts')
+      .replace(/\s*\((?:[−–-]?\d|max|use |one |highest|select|mm|score)[^()]*\)\s*:?$/i,'').replace(/:$/,'').replace(/^[A-Z]\.\s+/,'').trim();
+  }
+  function defaultIndex(sel){
+    const i = Array.from(sel.options).findIndex(o=>o.defaultSelected);
+    return i<0 ? 0 : i;
+  }
+  function checkboxItem(cb){
+    if(!cb.checked) return null;
+    const host = cb.closest('.check-item');
+    const lab = (host && host.querySelector('.ux-lbl')) || (cb.id && document.querySelector('label[for="'+cb.id+'"]'));
+    if(!lab) return null;
+    /* spa26Calc counts only the higher imaging item */
+    const notCounted = cb.id==='spa26-xray' && document.getElementById('spa26-mri').checked;
+    return withPts(shorten(stripped(lab,'.pts,.w,.hint,small')), notCounted ? 0 : (UX.chkPts(cb) || groupPts(cb)));
+  }
+  function tableName(sel){
+    const td = sel.closest('td'), tr = td.parentElement, table = sel.closest('table');
+    const row = tr.cells[0] ? stripped(tr.cells[0],'small,.hint,select') : '';
+    if(td.colSpan>1 || !table.tHead) return row;
+    const th = table.tHead.rows[0].cells[td.cellIndex];
+    const col = th ? stripped(th,'small,.hint').replace(/\s*(?:x \/ )?\d[–-]\d$/,'').replace(/ anterior corner$/i,'').replace(/\s*\/\s*/g,'/') : '';
+    if(/^(right|left)$/i.test(col)) return col+' '+row;
+    return col ? row+' '+col : row;
+  }
+  function selectItem(sel){
+    const u = sel._ux; if(!u) return null;
+    if(u.kind==='slider') return (fieldLabel(sel) || sel.id)+' '+sel.value;
+    const i = sel.selectedIndex, opt = sel.options[i], parsed = u.parsed[i], isDefault = i===defaultIndex(sel);
+    const hasValue = u.rule || parsed.pts!==undefined;
+    if(u.inTable){
+      if(isDefault && !UX.selPts(sel)) return null;
+      if(!hasValue) return tableName(sel)+': '+opt.value;
+      const n = UX.selPts(sel);
+      return n ? tableName(sel)+' '+pts(n) : null;
+    }
+    const label = fieldLabel(sel);
+    if(u.hasPts){
+      const n = UX.selPts(sel);
+      if(!n) return null;
+      const txt = parsed.txt || '';
+      if(!label || NO_DOMAIN_PREFIX.has(sel.closest('.panel').id.replace('panel-',''))) return shorten(txt)+' '+pts(n);
+      const short = txt.split(' — ')[0];
+      if(txt.length>40 && short.length>12) return shorten(txt)+' '+pts(n);      /* long option: self-explanatory */
+      return label+': '+(txt.length>40 ? short : txt)+' '+pts(n);
+    }
+    if(isDefault) return null;
+    const v = parsed.grade || shorten(parsed.txt);
+    return label ? label+': '+v : v;
+  }
+  function numberItem(input, skipDefault){
+    if(input.readOnly || input.closest('.ux-slider') || input.value==='') return null;
+    if(skipDefault && input.value===input.defaultValue) return null;
+    const label = input.getAttribute('aria-label') || fieldLabel(input) || input.id;
+    return label+' '+input.value;
+  }
+  function tileItem(group){
+    const t = group.querySelector('.tile.active');
+    if(!t) return null;
+    const n = +t.dataset.val||0;
+    if(!n) return null;
+    const txt = clean(t.firstElementChild ? t.firstElementChild.textContent : t.textContent);
+    const f = group.parentElement.querySelector(':scope > label');
+    const label = f ? stripped(f,'.dom-badge,.hint,small,.pts').replace(/\s*\([^()]*\)\s*$/,'').split(':')[0] : '';
+    return (label ? label+': '+txt : txt)+' '+pts(n);
+  }
+  function bilagItem(badge){
+    const grade = clean(badge.textContent);
+    if(grade==='E') return null;
+    const dn = badge.parentElement.querySelector('.dn');
+    return dn ? stripped(dn,'small')+': '+grade : null;
+  }
+  function items(panel){
+    const ctrls = Array.from(panel.querySelectorAll('input[type=checkbox], select, input[type=number], input[type=range], .tile-group, .bilag-grade-badge')).filter(visible);
+    const manyNumeric = ctrls.filter(e=>e.matches('input[type=number], input[type=range]')).length>8;
+    const out = [];
+    ctrls.forEach(el=>{
+      let s = null;
+      if(el.matches('input[type=checkbox]')) s = checkboxItem(el);
+      else if(el.matches('select')) s = selectItem(el);
+      else if(el.matches('input')) s = numberItem(el, manyNumeric);
+      else if(el.matches('.tile-group')) s = tileItem(el);
+      else s = bilagItem(el);
+      if(s && !out.includes(s)) out.push(s);
+    });
+    return out;
+  }
+  function scoreParts(id, results){
+    const list = results.flatMap(r=>Array.from(r.querySelectorAll('.score')).filter(visible)).map(s=>{
+      const c = s.cloneNode(true), sm = c.querySelector('small'), label = sm ? clean(sm.textContent) : '';
+      if(sm) sm.remove();
+      return {num:clean(c.textContent), label};
+    }).filter(s=>s.num!=='' && s.num!=='–');
+    return list.map(s=>{
+      const seg = s.label.split(' · ').map(clean).filter(Boolean), main = seg.shift() || '';
+      const kept = seg.filter(x=>!/^[✓✗–]/.test(x));   /* LLDAS/DORIS tick-lists are already stated by the verdict */
+      const detail = kept.length ? ' ('+kept.join('; ')+')' : '';
+      const of = main.match(/^(.*?)\s*\(of (\d+)\)(.*)$/);
+      if(of) return of[1]+' '+s.num+'/'+of[2]+of[3]+detail;
+      if(list.length>1 || NAMED_SCORE.has(id)) return main+' '+s.num+detail;
+      return 'total score '+s.num+(/[+=]/.test(main) ? ' ('+main+')' : '')+detail;
+    });
+  }
+  function verdict(pill, cat){
+    const t = clean(pill.textContent);
+    if(/enter values/i.test(t) || /^[^=]{1,30}=\s*[\d.]+\s*\/\s*[\d.]+$/.test(t)) return null;
+    if(cat!=='criteria') return t;
+    if(/meets|does not meet|definite|probable|possible|probability|supported|inflammatory back pain/i.test(t)) return t;
+    return 'does not meet criteria ('+t+')';
+  }
+  function text(c, panel){
+    const results = Array.from(panel.querySelectorAll('.result')).filter(visible);
+    const pills = results.flatMap(r=>Array.from(r.querySelectorAll('.pill')).filter(visible)).map(p=>verdict(p,c.cat)).filter(Boolean);
+    return calcName(c)+': '+scoreParts(c.id,results).concat(pills, items(panel)).join(', ');
+  }
+
+  function copy(ta, btn){
+    const done = ()=>{ btn.classList.add('done'); btn.textContent = '✓ 已複製 Copied'; setTimeout(()=>{ btn.classList.remove('done'); btn.textContent = '複製 Copy'; }, 1200); };
+    const legacy = ()=>{ ta.select(); try{ if(document.execCommand('copy')) done(); }catch(e){} };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, legacy);
+    else legacy();
+  }
+
+  const boxes = [];
+  CALCS.forEach(c=>{
+    const panel = document.getElementById('panel-'+c.id);
+    const anchor = panel && panel.querySelector('.card > .result');
+    if(!anchor) return;
+    const box = document.createElement('div'); box.className = 'copy-out';
+    const head = document.createElement('div'); head.className = 'copy-out-head';
+    const title = document.createElement('span'); title.textContent = '純文字 Plain text';
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy-out-btn'; btn.textContent = '複製 Copy';
+    const ta = document.createElement('textarea'); ta.readOnly = true; ta.rows = 1; ta.setAttribute('aria-label','Plain-text result');
+    head.append(title, btn); box.append(head, ta); anchor.after(box);
+    btn.addEventListener('click', ()=>copy(ta, btn));
+    boxes.push({c, panel, ta});
+  });
+  function refresh(){
+    boxes.forEach(b=>{
+      if(!visible(b.panel)) return;
+      const s = text(b.c, b.panel);
+      const w = b.ta.clientWidth;
+      if(b.ta.value===s && b.w===w) return;
+      b.ta.value = s; b.w = w;
+      b.ta.style.height = 'auto'; b.ta.style.height = b.ta.scrollHeight+'px';
+    });
+  }
+  let timer = 0;
+  const schedule = ()=>{ if(!timer) timer = setTimeout(()=>{ timer = 0; refresh(); }, 30); };
+  new MutationObserver(schedule).observe(document.getElementById('panels'), {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['class','style']});
+  ['input','change','click'].forEach(t=>document.addEventListener(t, schedule));
+  window.addEventListener('resize', schedule);
+  return {text, refresh};
+})();
+
 </script>
 <script>
 /* =========================================================
@@ -6088,9 +6913,9 @@ const APP = (function(){
   const GROUPS = [
     {key:'sle', zh:'紅斑性狼瘡',          en:'SLE',          kw:'狼瘡 紅斑 lupus 器官損傷 緩解 低疾病活動 damage remission t2t', ids:['g-sle','sledai','easybilag','g-t2t','sdi','clasi','lnpath']},
     {key:'sjd', zh:'乾燥症',              en:'Sjögren',      kw:'修格蘭 乾燥 sjogren sicca clinessdai star',         ids:['g-sjogren','essdai','esspri','cress']},
-    {key:'ssc', zh:'全身性硬化症 / MCTD',  en:'SSc / MCTD',   kw:'硬皮症 混合結締組織 scleroderma',                    ids:['ssc2013','mrss','mctd']},
+    {key:'ssc', zh:'全身性硬化症 / MCTD',  en:'SSc / MCTD',   kw:'硬皮症 混合結締組織 scleroderma 活動度 損傷 sctc eustar 肺高壓 pah detect', ids:['ssc2013','mrss','g-sscact','detect','mctd']},
     {key:'iim', zh:'肌炎 + IPAF',         en:'IIM + IPAF',   kw:'肌炎 皮肌炎 抗合成酶 間質性肺病 myositis dermatomyositis ild', ids:['iim2017','assd2025','cdasi','mmt8','ipaf']},
-    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 水腫 ra spa psa gout rs3pe', ids:['acreular2010','das28','cdai','gloess','g-spa','ibp','basdai','asdas','caspar','dapsa','gout2015','rs3pe']},
+    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 水腫 緩解 ra spa psa gout rs3pe boolean remission mri x-ray', ids:['acreular2010','das28','cdai','boolean','gloess','g-spa','ibp','basdai','asdas','sparcc','msasss','caspar','dapsa','gout2015','rs3pe']},
     {key:'vas', zh:'血管炎（含 PMR）',     en:'Vasculitis',   kw:'血管炎 風濕性多肌痛 貝西氏 巨細胞 高安 冷凝球蛋白 vasculitis pmr', ids:['gpa2022','mpa2022','egpa2022','gca2022','tak2022','pmr2012','pan1990','cryovasc','g-iga','behcet','ffs','bvas']},
     {key:'oth', zh:'其他',                en:'Others',       kw:'抗磷脂 成人史笛爾 類肉瘤 aps still sarcoidosis',       ids:['g-aps','g-igg4','aosd','sarcoid']},
   ];
@@ -6330,12 +7155,6 @@ const APP = (function(){
   render();
   return {go, back, GROUPS};
 })();
-</script>
-<script>
-/* Offline support: register the service worker (only when served over http/https, e.g. GitHub Pages) */
-if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
-  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
-}
 </script>
 </body>
 </html>
