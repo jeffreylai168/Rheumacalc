@@ -7,6 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RheumCalc">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <title>RheumCalc — Rheumatology Clinical Calculators</title>
 <style>
   :root{
@@ -465,6 +468,12 @@
   /* Title-as-toggle row with the definition underneath (SCTC-AI / SCTC-DI / EUSTAR-AI) */
   .crit-row{padding:2px 0 6px;}
   .crit-row .check-item.ux-toggle{margin-bottom:3px;}
+  /* Enthesitis / LDI: right-left pairs in two fixed columns */
+  .lr-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .ldi-row{border:1px solid var(--line); border-radius:8px; padding:8px 10px 4px; margin-bottom:8px; background:#fff;}
+  .ldi-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:13.5px; margin-bottom:4px;}
+  .ldi-out{font-size:12px; color:var(--ink-soft);}
+  .ldi-out.pos{color:var(--blue-dark); font-weight:700;}
   .crit-row .acr97-def{padding:0 4px 0 6px;}
   .crit-row.addon{margin-left:22px;}
   /* SPARCC: slice / DVU rows with three sliders */
@@ -808,6 +817,8 @@ const CALCS = [
   /* --- PsA --- */
   {id:'caspar', name:'Psoriatic arthritis (CASPAR) criteria', cat:'criteria', short:'Classification criteria for psoriatic arthritis'},
   {id:'dapsa', name:'DAPSA', cat:'activity', short:'Disease Activity in Psoriatic Arthritis'},
+  {id:'enthesitis', name:'Enthesitis (MASES / LEI)', cat:'activity', short:'Maastricht AS Enthesitis Score (13 sites) and Leeds Enthesitis Index (6 sites) on one page'},
+  {id:'ldi', name:'Leeds Dactylitis Index (LDI)', cat:'activity', short:'LDI basic — digit circumference ratio × tenderness, summed over dactylitic digits'},
   {id:'gout2015', name:'Gout criteria', cat:'criteria', short:'Classification criteria for gout'},
   {id:'rs3pe', name:'RS3PE criteria', cat:'criteria', short:'Remitting seronegative symmetrical synovitis with pitting edema — Olivé 1997 diagnostic criteria'},
   /* --- Vasculitis --- */
@@ -1559,6 +1570,138 @@ function dpCalc(){
 dpCalc();
 
 /* =========================================================
+   9b. Enthesitis — MASES (Heuft-Dorenbosch 2003, 13 sites) and
+   LEI (Healy & Helliwell 2008, 6 sites); each site tender = 1.
+   The Achilles insertion is shared by both indices.
+========================================================= */
+const enChk = (key, name, m, l, span) => ['R','L'].filter(s=>!span || s==='R').map(s=>{
+  const id = 'en-'+key+(span ? '' : '-'+s), lab = (span ? '' : (s==='R' ? 'Right ' : 'Left '))+name;
+  return `<div class="check-item${span?' ux-span':''}"><input type="checkbox" id="${id}" data-m="${m}" data-l="${l}" onchange="enCalc()"><label for="${id}">${lab}</label></div>`;
+}).join('');
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('enthesitis','Enthesitis indices — MASES and LEI',
+  'Press every enthesis that is tender on firm palpation. Both indices are scored from the same examination: MASES (13 sites, ankylosing spondylitis / axial SpA) and LEI (6 sites, psoriatic arthritis).','activity',
+  `<fieldset class="big-dom art"><legend>MASES only</legend>
+     <div class="ux-toggle-grid lr-grid">
+       ${enChk('cc1','1st costochondral joint',1,0)}
+       ${enChk('cc7','7th costochondral joint',1,0)}
+       ${enChk('asis','anterior superior iliac spine',1,0)}
+       ${enChk('crest','iliac crest',1,0)}
+       ${enChk('psis','posterior superior iliac spine',1,0)}
+       ${enChk('l5','5th lumbar spinous process',1,0,true)}
+     </div>
+   </fieldset>
+   <fieldset class="big-dom art"><legend>LEI only</legend>
+     <div class="ux-toggle-grid lr-grid">
+       ${enChk('lepi','lateral epicondyle of humerus',0,1)}
+       ${enChk('mfc','medial femoral condyle',0,1)}
+     </div>
+   </fieldset>
+   <fieldset class="big-dom art"><legend>MASES + LEI</legend>
+     <div class="ux-toggle-grid lr-grid">
+       ${enChk('ach','Achilles tendon insertion',1,1)}
+     </div>
+   </fieldset>`,
+  `<div style="display:flex; gap:24px; flex-wrap:wrap;">
+     <div><div class="score" id="en-mases">0<small>MASES (of 13)</small></div></div>
+     <div><div class="score" id="en-lei">0<small>LEI (of 6)</small></div></div>
+   </div>`,
+  'Each site scores 0 (not tender) or 1 (tender); no grading of pain intensity. MASES 0–13: 1st and 7th costochondral joints, anterior and posterior superior iliac spines, iliac crests, proximal insertion of the Achilles tendon (all bilateral) and the 5th lumbar spinous process. LEI 0–6: lateral epicondyles of the humerus, medial femoral condyles and Achilles tendon insertions, bilateral. Neither index has validated activity cut-offs.',
+  'Heuft-Dorenbosch L, Spoorenberg A, van Tubergen A, et al. Assessment of enthesitis in ankylosing spondylitis. <i>Ann Rheum Dis.</i> 2003;62(2):127–132. Healy PJ, Helliwell PS. Measuring clinical enthesitis in psoriatic arthritis: assessment of existing measures and development of an instrument specific to psoriatic arthritis. <i>Arthritis Rheum.</i> 2008;59(5):686–691.'
+));
+function enCalc(){
+  let m = 0, l = 0;
+  document.querySelectorAll('#panel-enthesitis input[type=checkbox]').forEach(cb=>{ if(cb.checked){ m += +cb.dataset.m; l += +cb.dataset.l; } });
+  document.getElementById('en-mases').innerHTML = m+'<small>MASES (of 13)</small>';
+  document.getElementById('en-lei').innerHTML = l+'<small>LEI (of 6)</small>';
+}
+enCalc();
+
+/* =========================================================
+   9c. Leeds Dactylitis Index — LDI basic (Helliwell 2005;
+   binary tenderness, Healy & Helliwell 2007).
+   Per digit: (A/B − 1) × 100 × tender(0/1); only digits ≥10%
+   larger than B count. B = same digit on the other side, or the
+   standard reference circumference when that digit is also
+   dactylitic (reference table in cm, stored here in mm).
+========================================================= */
+const LDI_DIGITS = [
+  ['H1','thumb',70,58],['H2','index finger',63,54],['H3','middle finger',63,54],['H4','ring finger',59,50],['H5','little finger',52,44],
+  ['F1','great toe',82,72],['F2','2nd toe',52,46],['F3','3rd toe',50,44],['F4','4th toe',50,44],['F5','5th toe',52,45],
+];
+const ldiName = (s,d) => (s==='R' ? 'Right ' : 'Left ')+d[1];
+const ldiPick = part => `<div class="ux-toggle-grid lr-grid">${LDI_DIGITS.filter(d=>d[0][0]===part).map(d=>['R','L'].map(s=>
+  `<div class="check-item"><input type="checkbox" id="ldi-p-${s}${d[0]}" onchange="ldiCalc()"><label for="ldi-p-${s}${d[0]}">${ldiName(s,d)}</label></div>`).join('')).join('')}</div>`;
+const ldiRows = () => LDI_DIGITS.map(d=>['R','L'].map(s=>{
+  const k = s+d[0], other = ldiName(s==='R'?'L':'R', d);
+  return `<div class="ldi-row" id="ldi-row-${k}" style="display:none;">
+    <div class="ldi-head"><b>${ldiName(s,d)}</b><span class="ldi-out" id="ldi-out-${k}"></span></div>
+    <div class="grid">
+      <div class="field"><label>Circumference of this digit (mm)</label><input type="number" id="ldi-a-${k}" min="0" max="300" step="1" placeholder="mm" oninput="ldiCalc()" aria-label="${ldiName(s,d)} circumference (mm)"></div>
+      <div class="field" id="ldi-bf-${k}"><label>${other} (mm)</label><input type="number" id="ldi-b-${k}" min="0" max="300" step="1" placeholder="mm" oninput="ldiCalc()" aria-label="${other} circumference (mm)"></div>
+      <div class="field" id="ldi-ref-${k}" style="display:none;"><label>Reference circumference</label><div class="hint" id="ldi-refv-${k}"></div></div>
+    </div>
+    <div class="check-item"><input type="checkbox" id="ldi-t-${k}" onchange="ldiCalc()"><label for="ldi-t-${k}">Tender</label></div>
+  </div>`;
+}).join('')).join('');
+panelsRoot.insertAdjacentHTML('beforeend', panelShell('ldi','Leeds Dactylitis Index (LDI basic)',
+  'Press each dactylitic digit, then enter its circumference and that of the same digit on the other side, and mark tenderness. If both sides of a digit are dactylitic, the standard reference circumference is used automatically.','activity',
+  `<div class="field" style="max-width:360px;"><label>Sex <span class="hint">reference circumference table</span></label>
+     <select id="ldi-sex" onchange="ldiCalc()"><option value="m" selected>Men</option><option value="f">Women</option></select></div>
+   <fieldset class="big-dom art"><legend>Dactylitic fingers</legend>${ldiPick('H')}</fieldset>
+   <fieldset class="big-dom art"><legend>Dactylitic toes</legend>${ldiPick('F')}</fieldset>
+   <fieldset class="big-dom art"><legend>Circumference &amp; tenderness</legend>
+     <div class="hint" id="ldi-none">Select dactylitic digits above.</div>
+     ${ldiRows()}
+   </fieldset>`,
+  `<div><div class="score" id="ldi-score">0<small>LDI basic</small></div></div><span class="pill neutral" id="ldi-pill">No dactylitic digit</span>`,
+  'LDI basic = Σ (A/B − 1) × 100 × T over dactylitic digits. A = circumference of the dactylitic digit; B = the same digit on the opposite hand or foot, or the standard reference value when that digit is also dactylitic; T = 1 if tender, 0 if not, so a non-tender dactylitic digit scores 0. A digit counts only if A is at least 10% larger than B (ratio ≥1.1). Measure both digits at the same level with a finger-circumference gauge or tape. The original LDI graded tenderness 0–3; LDI basic (binary tenderness) is the version used in trials. No validated activity cut-offs.',
+  'Helliwell PS, Firth J, Ibrahim GH, et al. Development of an assessment tool for dactylitis in patients with psoriatic arthritis. <i>J Rheumatol.</i> 2005;32(9):1745–1750. Healy PJ, Helliwell PS. Measuring dactylitis in clinical trials: which is the best instrument to use? <i>J Rheumatol.</i> 2007;34(6):1302–1306. Reference circumferences: risankizumab M16-002 statistical analysis plan, appendix A1 (standard digit reference tables).'
+));
+let LDI_RESULT = [];
+function ldiCalc(){
+  const el = id => document.getElementById(id);
+  const num = id => { const v = el(id).value; return v==='' ? null : +v; };
+  const female = el('ldi-sex').value==='f';
+  let total = 0, picked = 0, pending = 0, nDact = 0, nTender = 0;
+  LDI_RESULT = [];
+  LDI_DIGITS.forEach(d=>['R','L'].forEach(s=>{
+    const k = s+d[0], on = el('ldi-p-'+k).checked;
+    el('ldi-row-'+k).style.display = on ? '' : 'none';
+    if(!on) return;
+    picked++;
+    const both = el('ldi-p-'+(s==='R'?'L':'R')+d[0]).checked, ref = female ? d[3] : d[2];
+    el('ldi-bf-'+k).style.display = both ? 'none' : '';
+    el('ldi-ref-'+k).style.display = both ? '' : 'none';
+    el('ldi-refv-'+k).textContent = ref+' mm ('+(female ? 'women' : 'men')+') — the other side is also dactylitic';
+    const a = num('ldi-a-'+k), b = both ? ref : num('ldi-b-'+k), tender = el('ldi-t-'+k).checked, out = el('ldi-out-'+k);
+    out.className = 'ldi-out';
+    if(a===null || !b){ pending++; out.textContent = 'enter circumference'; return; }
+    const r = a/b, rs = roundTo(r,2).toFixed(2);
+    const row = {name:ldiName(s,d), a, b, both, tender, r:rs, v:0};
+    if(r < 1.1){ out.textContent = 'ratio '+rs+' — less than 10% larger, not counted'; row.not = true; LDI_RESULT.push(row); return; }
+    nDact++; if(tender) nTender++;
+    row.v = tender ? (r-1)*100 : 0; total += row.v;
+    out.textContent = 'ratio '+rs+' → '+(tender ? '+'+roundTo(row.v,1).toFixed(1) : '0 (not tender)');
+    if(tender) out.classList.add('pos');
+    LDI_RESULT.push(row);
+  }));
+  el('ldi-none').style.display = picked ? 'none' : '';
+  el('ldi-score').innerHTML = (picked && pending===picked ? '–' : roundTo(total,1))+'<small>LDI basic</small>';
+  const pill = el('ldi-pill');
+  pill.className = 'pill neutral';
+  if(!picked) pill.textContent = 'No dactylitic digit';
+  else if(pending) pill.textContent = 'Enter circumference for '+pending+' digit'+(pending>1?'s':'');
+  else pill.textContent = nDact+' dactylitic digit'+(nDact===1?'':'s')+' ('+nTender+' tender)';
+}
+function ldiCopyText(){
+  const pill = document.getElementById('ldi-pill').textContent, score = document.getElementById('ldi-score').firstChild.textContent;
+  const rows = LDI_RESULT.map(x=>x.name+' '+x.a+'/'+(x.both ? 'ref ' : '')+x.b+' mm (ratio '+x.r+', '+
+    (x.not ? 'not counted' : (x.tender ? 'tender, +'+roundTo(x.v,1).toFixed(1) : 'not tender, 0'))+')');
+  return ['LDI basic '+score, pill].concat(rows).join(', ');
+}
+ldiCalc();
+
+/* =========================================================
    10. 2019 EULAR/ACR SLE Classification Criteria
 ========================================================= */
 panelsRoot.insertAdjacentHTML('beforeend', panelShell('sle2019','SLE criteria',
@@ -2266,7 +2409,7 @@ const BILAG_CONST_ITEMS = [
 ];
 const BILAG_RENAL_CHECKS = [
   {id:'biopsy', name:'Histological evidence of active nephritis within the last 3 months', pts:1000},
-  {id:'sediment', name:'Active urinary sediment (haematuria, pyuria, or casts)', pts:1000},
+  {id:'sediment', name:'Active urinary sediment (haematuria, pyuria, or casts — RBC cast or WBC cast; exclude other causes)', pts:1000},
   {id:'nephrotic', name:'Nephrotic syndrome (heavy proteinuria, hypoalbuminaemia, oedema)', pts:100},
 ];
 const BILAG_RENAL_RADIOS = [
@@ -2682,6 +2825,41 @@ function bilagSummary(){
   if(document.getElementById('bicla-score')) biclaCalc();
 }
 bilagSummary();
+/* Plain-text line for the copy box (COPYTXT): "nA nB", then every item that drives an A or B domain.
+   Returns null while the BICLA sub-tab is shown, so the generic BICLA text is used there. */
+function bilagCopyText(){
+  if(document.getElementById('easybilag-tab-main').style.display==='none') return null;
+  const el = id => document.getElementById(id);
+  const tx = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g,' ').trim(); };
+  const STATE = ['not present','improving','same','worse','new'];
+  const grade = d => el('bilag-grade-'+d.id).textContent;
+  const items = d => {
+    const out = [];
+    if(d.special==='const'){
+      BILAG_CONST_ITEMS.forEach(it=>{ const v = bilagConstState[it.id]||0; if(v) out.push(it.name+' ('+STATE[v]+')'); });
+    } else if(d.special==='renal'){
+      BILAG_RENAL_CHECKS.forEach(c=>{ if(bilagIsChecked('bilag-renal-'+c.id)) out.push(tx(c.name).replace(/\s*\(.*\)$/,'')); });
+      const SHORT = {pcr:'Proteinuria', gfr:'GFR', cr:'Creatinine', bp:'BP'};
+      BILAG_RENAL_RADIOS.forEach(r=>{ const v = bilagRenalState[r.id]||0; const o = r.opts.find(x=>x[0]===v);
+        if(v && o) out.push(SHORT[r.id]+' '+tx(o[1]).split(' — ')[0]); });
+    } else if(d.special==='heme'){
+      const SHORT = {hb:'Hb', plt:'Platelets', wcc:'WBC', neut:'Neutrophils'};
+      BILAG_HEME_RADIOS.forEach(r=>{ const o = r.opts.find(x=>String(x[0])===String(bilagHemeState[r.id] ?? 'none'));
+        if(o && (o[2]==='A'||o[2]==='B')) out.push(SHORT[r.id]+' '+tx(o[1])+' ('+o[2]+')'); });
+      const ttp = +(bilagHemeState['ttp'] ?? 0);
+      if(ttp) out.push('TTP ('+STATE[ttp]+', '+(ttp===1?'B':'A')+')');
+    } else {
+      document.querySelectorAll('#bilag-domain-'+d.id+' .bilag-seg2').forEach(seg=>{
+        const it = d.items[+seg.dataset.idx], v = +seg.querySelector('button.active').dataset.val, g = it.tariffs[v];
+        if(g==='A'||g==='B') out.push(it.name+' ('+STATE[v]+', '+g+')');
+      });
+    }
+    return out;
+  };
+  const doms = ['A','B'].flatMap(g=>BILAG_DOMAINS.filter(d=>grade(d)===g).map(d=>d.name+' '+g+(items(d).length ? ': '+items(d).join('; ') : '')));
+  const nA = BILAG_DOMAINS.filter(d=>grade(d)==='A').length, nB = BILAG_DOMAINS.filter(d=>grade(d)==='B').length;
+  return [nA+'A '+nB+'B'].concat(doms).join(' | ');
+}
 function easybilagSetTab(tab){
   document.getElementById('easybilag-btn-main').classList.toggle('active', tab==='main');
   document.getElementById('easybilag-btn-bicla').classList.toggle('active', tab==='bicla');
@@ -3646,41 +3824,36 @@ mmt8Calc();
    56. Boolean RA remission — ACR/EULAR 2011 (Felson) and 2022 revision (Studenic)
    TJC ≤1, SJC ≤1, CRP ≤1 mg/dL and PtGA ≤1 (2011) or ≤2 (Boolean 2.0).
 ========================================================= */
-const boolNum = (id,label,hint,max,step) => `<div class="field"><label>${label} <span class="hint">${hint}</span></label><input type="number" id="${id}" min="0"${max?` max="${max}"`:''} step="${step}" placeholder="enter value" oninput="boolCalc()"></div>`;
+const boolChk = (id,label) => `<div class="check-item"><input type="checkbox" id="${id}" onchange="boolCalc(this)"><label for="${id}">${label}</label></div>`;
 panelsRoot.insertAdjacentHTML('beforeend', panelShell('boolean','Boolean remission in RA',
-  'ACR/EULAR Boolean definition of remission — every item must be met at the same time point. Both the 2022 revision (Boolean 2.0) and the original 2011 definition are shown.','activity',
+  'ACR/EULAR Boolean definition of remission — every item must be met at the same time point. Both the 2022 revision (Boolean 2.0) and the original 2011 definition are shown. Press each item that is met.','activity',
   `<fieldset class="big-dom art"><legend>Boolean items</legend>
-     <div class="grid">
-       ${boolNum('bool-tjc','Tender joint count','(≤1)',28,1)}
-       ${boolNum('bool-sjc','Swollen joint count','(≤1)',28,1)}
-       ${boolNum('bool-crp','CRP','mg/dL (≤1)',0,0.01)}
-       ${boolNum('bool-ptga','Patient global assessment','0–10 (Boolean 2.0 ≤2 · 2011 ≤1)',10,0.1)}
-     </div>
-     <div class="hint" id="bool-detail" style="margin-top:10px;"></div>
+     ${boolChk('bool-tjc','Tender joint count ≤1')}
+     ${boolChk('bool-sjc','Swollen joint count ≤1')}
+     ${boolChk('bool-crp','CRP ≤1 mg/dL')}
+     ${boolChk('bool-ptga2','Patient global ≤2 of 10 (Boolean 2.0)')}
+     ${boolChk('bool-ptga1','Patient global ≤1 of 10 (2011 Boolean)')}
    </fieldset>`,
-  `<div><div class="score" id="bool-score">–<small>Items met for Boolean 2.0 (of 4)</small></div></div>
-   <div class="cs-pills"><span class="pill neutral" id="bool-pill2">Boolean 2.0: enter values</span><span class="pill neutral" id="bool-pill1">2011 Boolean: enter values</span></div>`,
+  `<div><div class="score" id="bool-score">0<small>Items met for Boolean 2.0 (of 4)</small></div></div>
+   <div class="cs-pills"><span class="pill neutral" id="bool-pill2">Not in Boolean 2.0 remission</span><span class="pill neutral" id="bool-pill1">Not in 2011 Boolean remission</span></div>`,
   'Boolean 2.0 (2022 ACR/EULAR): TJC ≤1, SJC ≤1, CRP ≤1 mg/dL and PtGA ≤2 (0–10). 2011 Boolean: the same with PtGA ≤1. A 28-joint count may miss active joints, especially in the feet and ankles — it is preferable to include feet and ankles when evaluating remission. The index-based definitions (SDAI ≤3.3, CDAI ≤2.8) were endorsed alongside Boolean and are on the CDAI / SDAI page.',
   'Studenic P, Aletaha D, de Wit M, et al. American College of Rheumatology/EULAR remission criteria for rheumatoid arthritis: 2022 revision. <i>Ann Rheum Dis.</i> 2023;82(1):74–80. Felson DT, Smolen JS, Wells G, et al. American College of Rheumatology/European League Against Rheumatism provisional definition of remission in rheumatoid arthritis for clinical trials. <i>Arthritis Rheum.</i> 2011;63(3):573–586.'
 ));
-function boolCalc(){
-  const n = id => { const v = document.getElementById(id).value; return v==='' ? null : +v; };
-  const t = n('bool-tjc'), s = n('bool-sjc'), c = n('bool-crp'), p = n('bool-ptga');
-  const base = [[t,'TJC ≤1'],[s,'SJC ≤1'],[c,'CRP ≤1 mg/dL']].map(([v,l])=>({l, ok: v===null ? null : v<=1}));
-  const mk = lim => base.concat([{l:'PtGA ≤'+lim, ok: p===null ? null : p<=lim}]);
-  const b2 = mk(2), b1 = mk(1);
-  const met = b2.filter(x=>x.ok===true).length, any = b2.some(x=>x.ok!==null);
-  document.getElementById('bool-score').innerHTML = (any ? met : '–')+'<small>Items met for Boolean 2.0 (of 4)</small>';
-  document.getElementById('bool-detail').textContent = any ? b2.map(x=>(x.ok===true?'✓ ':x.ok===false?'✗ ':'– ')+x.l).join(' · ') : '';
-  const set = (id, name, list) => {
-    const el = document.getElementById(id);
-    if(!any){ el.className='pill neutral'; el.textContent=name+': enter values'; return; }
-    if(list.some(x=>x.ok===false)){ el.className='pill neutral'; el.textContent='Not in '+name+' remission'; return; }
-    if(list.some(x=>x.ok===null)){ el.className='pill neutral'; el.textContent=name+': enter all 4 items'; return; }
-    el.className='pill green'; el.textContent='In '+name+' remission';
+function boolCalc(changed){
+  const el = id => document.getElementById(id);
+  /* PtGA ≤1 implies PtGA ≤2, so the two buttons stay consistent */
+  if(changed && changed.id==='bool-ptga1' && changed.checked) el('bool-ptga2').checked = true;
+  if(changed && changed.id==='bool-ptga2' && !changed.checked) el('bool-ptga1').checked = false;
+  if(changed && typeof UX!=='undefined') UX.sync(el('panel-boolean'));
+  const base = ['bool-tjc','bool-sjc','bool-crp'].filter(id=>el(id).checked).length;
+  const met2 = base + (el('bool-ptga2').checked ? 1 : 0), met1 = base + (el('bool-ptga1').checked ? 1 : 0);
+  el('bool-score').innerHTML = met2+'<small>Items met for Boolean 2.0 (of 4)</small>';
+  const set = (id, name, met) => {
+    el(id).className = 'pill '+(met===4 ? 'green' : 'neutral');
+    el(id).textContent = (met===4 ? 'In ' : 'Not in ')+name+' remission';
   };
-  set('bool-pill2','Boolean 2.0',b2);
-  set('bool-pill1','2011 Boolean',b1);
+  set('bool-pill2','Boolean 2.0',met2);
+  set('bool-pill1','2011 Boolean',met1);
 }
 boolCalc();
 
@@ -5889,6 +6062,40 @@ appendRefTable('iim2017', `
 appendRefTable('cdasi', `
   <p class="hint">Verified structure only (see panel note above for what could not be independently confirmed): Activity = 3 components (erythema, scale, ulceration/erosion) across 15 anatomic sites, plus separately-scored hands, periungual change, and alopecia, totaling 0–100. Damage = poikiloderma + calcinosis only, 0–32. Total combined 0–132. Yassaee M, Fiorentino D, Okawa J, et al. <i>Br J Dermatol.</i> 2010;163(6):1179–1183.</p>`);
 
+appendRefTable('enthesitis', `
+  <table><caption>Enthesis sites (each tender = 1)</caption>
+  <thead><tr><th>Site (bilateral unless stated)</th><th>MASES</th><th>LEI</th></tr></thead>
+  <tbody>
+    <tr><td>1st costochondral joint</td><td>✓</td><td></td></tr>
+    <tr><td>7th costochondral joint</td><td>✓</td><td></td></tr>
+    <tr><td>Anterior superior iliac spine</td><td>✓</td><td></td></tr>
+    <tr><td>Iliac crest</td><td>✓</td><td></td></tr>
+    <tr><td>Posterior superior iliac spine</td><td>✓</td><td></td></tr>
+    <tr><td>5th lumbar spinous process (single site)</td><td>✓</td><td></td></tr>
+    <tr><td>Lateral epicondyle of humerus</td><td></td><td>✓</td></tr>
+    <tr><td>Medial femoral condyle</td><td></td><td>✓</td></tr>
+    <tr><td>Achilles tendon insertion</td><td>✓</td><td>✓</td></tr>
+    <tr><td><b>Range</b></td><td><b>0–13</b></td><td><b>0–6</b></td></tr>
+  </tbody></table>`);
+
+appendRefTable('ldi', `
+  <table><caption>Standard digit reference circumference (used when both sides are dactylitic)</caption>
+  <thead><tr><th>Digit</th><th>Men</th><th>Women</th></tr></thead>
+  <tbody>
+    <tr><td>Thumb</td><td>7.0 cm</td><td>5.8 cm</td></tr>
+    <tr><td>Index finger</td><td>6.3 cm</td><td>5.4 cm</td></tr>
+    <tr><td>Middle finger</td><td>6.3 cm</td><td>5.4 cm</td></tr>
+    <tr><td>Ring finger</td><td>5.9 cm</td><td>5.0 cm</td></tr>
+    <tr><td>Little finger</td><td>5.2 cm</td><td>4.4 cm</td></tr>
+    <tr><td>Great toe</td><td>8.2 cm</td><td>7.2 cm</td></tr>
+    <tr><td>2nd toe</td><td>5.2 cm</td><td>4.6 cm</td></tr>
+    <tr><td>3rd toe</td><td>5.0 cm</td><td>4.4 cm</td></tr>
+    <tr><td>4th toe</td><td>5.0 cm</td><td>4.4 cm</td></tr>
+    <tr><td>5th toe</td><td>5.2 cm</td><td>4.5 cm</td></tr>
+  </tbody></table>
+  <div class="formula-box">Per digit = (A / B − 1) × 100 × T (T = 1 tender, 0 not tender); counted only if A / B ≥ 1.1. LDI basic = sum over digits.</div>
+  <p class="hint">Reference values as printed in the risankizumab M16-002 statistical analysis plan, appendix A1 (the great toe is listed there as "central toe").</p>`);
+
 appendRefTable('boolean', `
   <table><caption>ACR/EULAR Boolean-based definitions of remission</caption>
   <thead><tr><th>Item</th><th>2011 (Felson)</th><th>2022 Boolean 2.0 (Studenic)</th></tr></thead>
@@ -6856,8 +7063,11 @@ const COPYTXT = (function(){
     return 'does not meet criteria ('+t+')';
   }
   function text(c, panel){
+    const fn = {easybilag: typeof bilagCopyText==='function' && bilagCopyText, ldi: typeof ldiCopyText==='function' && ldiCopyText}[c.id];
+    const custom = fn ? fn() : null;
+    if(custom) return calcName(c)+': '+custom;
     const results = Array.from(panel.querySelectorAll('.result')).filter(visible);
-    const pills = results.flatMap(r=>Array.from(r.querySelectorAll('.pill')).filter(visible)).map(p=>verdict(p,c.cat)).filter(Boolean);
+    const pills = results.flatMap(r=>Array.from(r.querySelectorAll('.pill')).filter(p=>visible(p) && p.id!=='bilag-pill')).map(p=>verdict(p,c.cat)).filter(Boolean);
     return calcName(c)+': '+scoreParts(c.id,results).concat(pills, items(panel)).join(', ');
   }
 
@@ -6915,7 +7125,7 @@ const APP = (function(){
     {key:'sjd', zh:'乾燥症',              en:'Sjögren',      kw:'修格蘭 乾燥 sjogren sicca clinessdai star',         ids:['g-sjogren','essdai','esspri','cress']},
     {key:'ssc', zh:'全身性硬化症 / MCTD',  en:'SSc / MCTD',   kw:'硬皮症 混合結締組織 scleroderma 活動度 損傷 sctc eustar 肺高壓 pah detect', ids:['ssc2013','mrss','g-sscact','detect','mctd']},
     {key:'iim', zh:'肌炎 + IPAF',         en:'IIM + IPAF',   kw:'肌炎 皮肌炎 抗合成酶 間質性肺病 myositis dermatomyositis ild', ids:['iim2017','assd2025','cdasi','mmt8','ipaf']},
-    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 水腫 緩解 ra spa psa gout rs3pe boolean remission mri x-ray', ids:['acreular2010','das28','cdai','boolean','gloess','g-spa','ibp','basdai','asdas','sparcc','msasss','caspar','dapsa','gout2015','rs3pe']},
+    {key:'art', zh:'關節炎',              en:'Arthritis',    kw:'類風濕 關節炎 脊椎關節炎 僵直性 乾癬 痛風 超音波 水腫 緩解 ra spa psa gout rs3pe boolean remission mri x-ray 附著點炎 指炎 腊腸指 enthesitis dactylitis mases lei ldi leeds', ids:['acreular2010','das28','cdai','boolean','gloess','g-spa','ibp','basdai','asdas','sparcc','msasss','caspar','dapsa','enthesitis','ldi','gout2015','rs3pe']},
     {key:'vas', zh:'血管炎（含 PMR）',     en:'Vasculitis',   kw:'血管炎 風濕性多肌痛 貝西氏 巨細胞 高安 冷凝球蛋白 vasculitis pmr', ids:['gpa2022','mpa2022','egpa2022','gca2022','tak2022','pmr2012','pan1990','cryovasc','g-iga','behcet','ffs','bvas']},
     {key:'oth', zh:'其他',                en:'Others',       kw:'抗磷脂 成人史笛爾 類肉瘤 aps still sarcoidosis',       ids:['g-aps','g-igg4','aosd','sarcoid']},
   ];
@@ -7155,6 +7365,12 @@ const APP = (function(){
   render();
   return {go, back, GROUPS};
 })();
+</script>
+<script>
+/* Offline support: register the service worker (only when served over http/https, e.g. GitHub Pages) */
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
 </script>
 </body>
 </html>
